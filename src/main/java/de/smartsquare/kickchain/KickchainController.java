@@ -1,38 +1,29 @@
 package de.smartsquare.kickchain;
 
-import org.springframework.http.MediaType;
+import de.smartsquare.kickchain.domain.KcFullChain;
+import de.smartsquare.kickchain.domain.KcTransaction;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 
 @Controller
 public class KickchainController {
 
+    Kickchain kc = new Kickchain();
 
-    @XmlRootElement
-    public static class Kickchain implements Serializable {
 
-        String text;
-
-        public String getText() {
-            return text;
-        }
-
-        public void setText(String text) {
-            this.text = text;
-        }
+    @PostMapping(value = "/transactions/new")
+    @ResponseBody
+    public int newTransaction(@RequestBody KcTransaction transaction) {
+        return kc.addTransaction(transaction);
     }
 
-    @GetMapping(value = "/result/new", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @GetMapping(value = "/result/new")
+    @GetMapping(value = "/chain")
     @ResponseBody
-    public Kickchain newResult() {
-        Kickchain kc = new Kickchain();
-        kc.setText("Hello");
-        return kc;
+    public KcFullChain fullChain() {
+        return kc.fullChain();
     }
 
 }
