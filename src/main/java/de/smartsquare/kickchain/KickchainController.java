@@ -1,7 +1,7 @@
 package de.smartsquare.kickchain;
 
 import de.smartsquare.kickchain.domain.KcFullChain;
-import de.smartsquare.kickchain.domain.KcTransaction;
+import de.smartsquare.kickchain.domain.KcGame;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +14,10 @@ public class KickchainController {
     Kickchain kc = new Kickchain();
 
 
-    @PostMapping(value = "/transactions/new")
+    @PostMapping(value = "/game/new")
     @ResponseBody
-    public int newTransaction(@RequestBody KcTransaction transaction) {
-        return kc.addTransaction(transaction);
+    public int newGame(@RequestBody KcGame game) throws KcException {
+        return kc.newGame(game);
     }
 
     @GetMapping(value = "/chain")
@@ -25,5 +25,7 @@ public class KickchainController {
     public KcFullChain fullChain() {
         return kc.fullChain();
     }
+
+
 
 }

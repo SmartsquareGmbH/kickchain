@@ -16,20 +16,18 @@ public class Kickchain {
 
     private List<KcBlock> chain = new ArrayList<>();
 
-    private List<KcTransaction> currentTransactions = new ArrayList<>();
-
 
     public Kickchain() {
         try {
-            newBlock(100, "1");
+            newBlock(100, "1", null);
         } catch (KcException e) {
             e.printStackTrace();
         }
     }
 
-    public void newBlock(long proof, String previousHash) throws KcException {
+    void newBlock(long proof, String previousHash, KcGame game) throws KcException {
         try {
-            KcBlock block = new KcBlock(chain.size() + 1, Instant.now(), currentTransactions, proof, previousHash == null ? hashBlock(lastBlock()) : previousHash);
+            KcBlock block = new KcBlock(chain.size() + 1, Instant.now(), game, proof, previousHash == null ? hashBlock(lastBlock()) : previousHash);
             chain.add(block);
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,18 +35,17 @@ public class Kickchain {
         }
     }
 
-    public int newTransaction(List<String> playerTeam1, List<String> playerTeam2, int goalsTeam1, int goalsTeam2) {
-        KcTeam team1 = new KcTeam((String[])playerTeam1.toArray());
-        KcTeam team2 = new KcTeam((String[])playerTeam2.toArray());
-        KcScore score = new KcScore(goalsTeam1, goalsTeam2);
-        KcTransaction transaction = new KcTransaction(team1, team2, score);
+    public int newGame(KcGame game) throws KcException {
 
-        return addTransaction(transaction);
-    }
+        try {
+            long proofOfWork = proofOfWork(lastProof());
+            String previousHash = hashBlock(lastBlock());
+            newBlock(proofOfWork,previousHash,game);
+        } catch (NoSuchAlgorithmException |IOException e) {
+            throw new KcException("Unable to get proof of work",e);
+        }
 
-    public int addTransaction(KcTransaction transaction) {
-        currentTransactions.add(transaction);
-        return lastBlock().getIndex() + 1;
+        return lastBlock().getIndex();
     }
 
     private KcBlock lastBlock() throws NoSuchElementException {
@@ -64,6 +61,11 @@ public class Kickchain {
         StringWriter writer = new StringWriter();
         mapper.writeValue(writer, block);
         return MessageDigestUtils.sha256(writer.toString());
+    }
+
+
+    private long lastProof() {
+        return lastBlock().getProof();
     }
 
     public long proofOfWork(long lastProof) throws NoSuchAlgorithmException {

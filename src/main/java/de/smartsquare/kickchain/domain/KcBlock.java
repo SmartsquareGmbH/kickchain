@@ -9,16 +9,16 @@ public class KcBlock {
 
     Instant timestamp;
 
-    List<KcTransaction> transactions;
+    KcGame game;
 
     long proof;
 
     String previousHash;
 
-    public KcBlock(int index, Instant timestamp, List<KcTransaction> transactions, long proof, String previousHash) {
+    public KcBlock(int index, Instant timestamp, KcGame game, long proof, String previousHash) {
         this.index = index;
         this.timestamp = timestamp;
-        this.transactions = transactions;
+        this.game = game;
         this.proof = proof;
         this.previousHash = previousHash;
     }
@@ -31,8 +31,8 @@ public class KcBlock {
         return timestamp;
     }
 
-    public List<KcTransaction> getTransactions() {
-        return transactions;
+    public KcGame getGame() {
+        return game;
     }
 
     public long getProof() {

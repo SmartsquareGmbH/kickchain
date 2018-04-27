@@ -1,6 +1,6 @@
 package de.smartsquare.kickchain.domain;
 
-public class KcTransaction {
+public class KcGame {
 
     private KcTeam team1;
 
@@ -8,10 +8,10 @@ public class KcTransaction {
 
     private KcScore score;
 
-    public KcTransaction() {
+    public KcGame() {
     }
 
-    public KcTransaction(KcTeam team1, KcTeam team2, KcScore score) {
+    public KcGame(KcTeam team1, KcTeam team2, KcScore score) {
         this.team1 = team1;
         this.team2 = team2;
         this.score = score;
