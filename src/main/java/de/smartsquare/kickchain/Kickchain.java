@@ -1,31 +1,35 @@
 package de.smartsquare.kickchain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.smartsquare.kickchain.domain.*;
+import de.smartsquare.kickchain.domain.KcBlock;
+import de.smartsquare.kickchain.domain.KcFullChain;
+import de.smartsquare.kickchain.domain.KcGame;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class Kickchain {
 
     private List<KcBlock> chain = new ArrayList<>();
+    private Set<String> nodes = new HashSet<>();
 
 
     public Kickchain() {
         try {
             newBlock(100, "1", null);
+            nodes.add("localhost:8080");
         } catch (KcException e) {
             e.printStackTrace();
         }
     }
 
-    void newBlock(long proof, String previousHash, KcGame game) throws KcException {
+    private void newBlock(long proof, String previousHash, KcGame game) throws KcException {
         try {
             KcBlock block = new KcBlock(chain.size() + 1, Instant.now(), game, proof, previousHash == null ? hashBlock(lastBlock()) : previousHash);
             chain.add(block);
@@ -40,9 +44,9 @@ public class Kickchain {
         try {
             long proofOfWork = proofOfWork(lastProof());
             String previousHash = hashBlock(lastBlock());
-            newBlock(proofOfWork,previousHash,game);
-        } catch (NoSuchAlgorithmException |IOException e) {
-            throw new KcException("Unable to get proof of work",e);
+            newBlock(proofOfWork, previousHash, game);
+        } catch (NoSuchAlgorithmException | IOException e) {
+            throw new KcException("Unable to get proof of work", e);
         }
 
         return lastBlock().getIndex();
@@ -85,5 +89,63 @@ public class Kickchain {
 
     public KcFullChain fullChain() {
         return new KcFullChain(Collections.unmodifiableList(chain));
+    }
+
+    public void registerNode(String address) {
+        nodes.add(address);
+    }
+
+    public boolean validChain(List<KcBlock> pChain) throws KcException {
+        try {
+            KcBlock latestBlock = pChain.get(0);
+
+            for (KcBlock current : pChain) {
+                System.out.println(latestBlock);
+                System.out.println(current);
+
+                if (!lastBlock().getPreviousHash().equals(hashBlock(latestBlock))) {
+                    return false;
+                }
+                if (!validProof(latestBlock.getProof(), current.getProof())) {
+                    return false;
+                }
+                latestBlock = current;
+            }
+            return true;
+        } catch (IOException | NoSuchAlgorithmException ex) {
+            throw new KcException("Unable to validate chain", ex);
+        }
+    }
+
+    public Set<String> getNodes() {
+        return nodes;
+    }
+
+    public List<KcBlock> getChain() {
+        return chain;
+    }
+
+    public boolean resolveConflicts() throws KcException {
+        List<KcBlock> newChain = null;
+
+        int maxLength = chain.size();
+
+        for (String node : nodes) {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<KcFullChain> response = restTemplate.getForEntity("http://" + node + "/chain", KcFullChain.class);
+
+            if (response.getStatusCode().equals(HttpStatus.OK)) {
+                if (response.getBody().getLength() > maxLength && validChain(response.getBody().getChain())) {
+                    maxLength = response.getBody().getLength();
+                    newChain = response.getBody().getChain();
+                }
+            }
+        }
+        if (newChain != null) {
+            this.chain = newChain;
+            return true;
+        } else {
+            return false;
+        }
     }
 }

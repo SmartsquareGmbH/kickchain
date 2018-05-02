@@ -8,6 +8,8 @@ public class KcFullChain {
 
     private int length;
 
+    private KcFullChain() {
+    }
 
     public KcFullChain(List<KcBlock> chain) {
         this.chain = chain;

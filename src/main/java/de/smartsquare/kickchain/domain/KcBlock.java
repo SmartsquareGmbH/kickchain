@@ -1,19 +1,18 @@
 package de.smartsquare.kickchain.domain;
 
 import java.time.Instant;
-import java.util.List;
 
 public class KcBlock {
 
     private int index;
 
-    Instant timestamp;
+    private Instant timestamp;
 
-    KcGame game;
+    private KcGame game;
 
-    long proof;
+    private long proof;
 
-    String previousHash;
+    private String previousHash;
 
     public KcBlock(int index, Instant timestamp, KcGame game, long proof, String previousHash) {
         this.index = index;
@@ -21,6 +20,9 @@ public class KcBlock {
         this.game = game;
         this.proof = proof;
         this.previousHash = previousHash;
+    }
+
+    private KcBlock() {
     }
 
     public int getIndex() {
