@@ -14,8 +14,6 @@ import java.time.Instant;
 @Service
 public class KickchainService {
 
-    // private List<KcBlock> chain = new ArrayList<>();
-
 
     public KcFullChain create() {
         KcFullChain fullChain = new KcFullChain();
@@ -38,7 +36,7 @@ public class KickchainService {
         }
     }
 
-    public int newGame(KcGame game, KcFullChain fullChain) throws KcException {
+    public int newGame(KcFullChain fullChain, KcGame game) throws KcException {
 
         try {
             long proofOfWork = proofOfWork(lastProof(fullChain));
@@ -53,7 +51,7 @@ public class KickchainService {
     }
 
 
-    private String hashBlock(KcBlock block) throws IOException, NoSuchAlgorithmException {
+    public String hashBlock(KcBlock block) throws IOException, NoSuchAlgorithmException {
         ObjectMapper mapper = new ObjectMapper();
         StringWriter writer = new StringWriter();
         mapper.writeValue(writer, block);
@@ -65,7 +63,7 @@ public class KickchainService {
         return fullChain.lastBlock().getProof();
     }
 
-    public long proofOfWork(long lastProof) throws NoSuchAlgorithmException {
+    long proofOfWork(long lastProof) throws NoSuchAlgorithmException {
         long proof = 0;
         while (!validProof(lastProof, proof)) {
             proof = proof + 1;
@@ -73,7 +71,7 @@ public class KickchainService {
         return proof;
     }
 
-    private boolean validProof(long lastProof, long proof) throws NoSuchAlgorithmException {
+    public boolean validProof(long lastProof, long proof) throws NoSuchAlgorithmException {
         String guess = String.format("%d%d", lastProof, proof);
         String guessHash = MessageDigestUtils.sha256(Integer.toString(guess.hashCode()));
         return guessHash.startsWith("000000");

@@ -1,9 +1,10 @@
 package de.smartsquare.kickchain.service;
 
 import de.smartsquare.kickchain.KcException;
-import de.smartsquare.kickchain.Kickchain;
+import de.smartsquare.kickchain.KickchainService;
 import de.smartsquare.kickchain.domain.KcBlock;
 import de.smartsquare.kickchain.domain.KcFullChain;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,11 +13,13 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
 public class ConsensusService {
+
+    @Autowired
+    KickchainService kickchainService;
 
     private Set<String> nodes = new HashSet<>();
 
@@ -25,18 +28,18 @@ public class ConsensusService {
         nodes.add(address);
     }
 
-    public boolean validChain(Kickchain mine, Kickchain their) throws KcException {
+    public boolean validChain(KcFullChain mine, KcFullChain their) throws KcException {
         try {
             KcBlock latestBlock = their.lastBlock();
 
-            for (KcBlock current : their.) {
+            for (KcBlock current : their.getChain()) {
                 System.out.println(latestBlock);
                 System.out.println(current);
 
-                if (!mine.lastBlock().getPreviousHash().equals(hashBlock(latestBlock))) {
+                if (!mine.lastBlock().getPreviousHash().equals(kickchainService.hashBlock(latestBlock))) {
                     return false;
                 }
-                if (!validProof(latestBlock.getProof(), current.getProof())) {
+                if (!kickchainService.validProof(latestBlock.getProof(), current.getProof())) {
                     return false;
                 }
                 latestBlock = current;
@@ -51,31 +54,26 @@ public class ConsensusService {
         return nodes;
     }
 
-    public List<KcBlock> getChain() {
-        return chain;
-    }
+    public KcFullChain resolveConflicts(KcFullChain mine) throws KcException {
+        KcFullChain newChain = null;
 
-    public boolean resolveConflicts() throws KcException {
-        List<KcBlock> newChain = null;
-
-        int maxLength = chain.size();
+        int maxLength = mine.getChain().size();
 
         for (String node : nodes) {
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<KcFullChain> response = restTemplate.getForEntity("http://" + node + "/chain", KcFullChain.class);
 
             if (response.getStatusCode().equals(HttpStatus.OK)) {
-                if (response.getBody().getLength() > maxLength && validChain(response.getBody().getChain())) {
-                    maxLength = response.getBody().getLength();
-                    newChain = response.getBody().getChain();
+                if (response.getBody().getChain().size() > maxLength && validChain(mine, response.getBody())) {
+                    maxLength = response.getBody().getChain().size();
+                    newChain = response.getBody();
                 }
             }
         }
         if (newChain != null) {
-            this.chain = newChain;
-            return true;
+            return newChain;
         } else {
-            return false;
+            return mine;
         }
     }
 }
