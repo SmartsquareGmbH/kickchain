@@ -1,9 +1,8 @@
 package de.smartsquare.kickchain.service;
 
-import de.smartsquare.kickchain.KcException;
-import de.smartsquare.kickchain.KickchainService;
-import de.smartsquare.kickchain.domain.KcBlock;
-import de.smartsquare.kickchain.domain.KcFullChain;
+import de.smartsquare.kickchain.BlockchainException;
+import de.smartsquare.kickchain.domain.Block;
+import de.smartsquare.kickchain.domain.Blockchain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +17,24 @@ import java.util.Set;
 @Service
 public class ConsensusService {
 
-    @Autowired
-    KickchainService kickchainService;
+    private final KickchainService kickchainService;
 
     private Set<String> nodes = new HashSet<>();
 
+    @Autowired
+    public ConsensusService(KickchainService kickchainService) {
+        this.kickchainService = kickchainService;
+    }
 
     public void registerNode(String address) {
         nodes.add(address);
     }
 
-    public boolean validChain(KcFullChain mine, KcFullChain their) throws KcException {
+    private boolean validChain(Blockchain mine, Blockchain their) throws BlockchainException {
         try {
-            KcBlock latestBlock = their.lastBlock();
+            Block latestBlock = their.lastBlock();
 
-            for (KcBlock current : their.getChain()) {
+            for (Block current : their.getChain()) {
                 System.out.println(latestBlock);
                 System.out.println(current);
 
@@ -46,7 +48,7 @@ public class ConsensusService {
             }
             return true;
         } catch (IOException | NoSuchAlgorithmException ex) {
-            throw new KcException("Unable to validate chain", ex);
+            throw new BlockchainException("Unable to validate chain", ex);
         }
     }
 
@@ -54,14 +56,14 @@ public class ConsensusService {
         return nodes;
     }
 
-    public KcFullChain resolveConflicts(KcFullChain mine) throws KcException {
-        KcFullChain newChain = null;
+    public Blockchain resolveConflicts(Blockchain mine) throws BlockchainException {
+        Blockchain newChain = null;
 
         int maxLength = mine.getChain().size();
 
         for (String node : nodes) {
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<KcFullChain> response = restTemplate.getForEntity("http://" + node + "/chain", KcFullChain.class);
+            ResponseEntity<Blockchain> response = restTemplate.getForEntity("http://" + node + "/chain", Blockchain.class);
 
             if (response.getStatusCode().equals(HttpStatus.OK)) {
                 if (response.getBody().getChain().size() > maxLength && validChain(mine, response.getBody())) {

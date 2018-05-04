@@ -2,10 +2,11 @@ package de.smartsquare.kickchain;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.smartsquare.kickchain.domain.KcGame;
-import de.smartsquare.kickchain.domain.KcScore;
-import de.smartsquare.kickchain.domain.KcTeam;
+import de.smartsquare.kickchain.domain.Game;
+import de.smartsquare.kickchain.domain.Score;
+import de.smartsquare.kickchain.domain.Team;
 import de.smartsquare.kickchain.service.ConsensusService;
+import de.smartsquare.kickchain.service.KickchainService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -48,10 +49,10 @@ public class KickchainControllerTest {
     public void testNewGame() throws Exception {
         Mockito.when(kickchainService.newGame(any(), any())).thenReturn(2);
 
-        KcTeam team1 = new KcTeam("A");
-        KcTeam team2 = new KcTeam("B", "C");
-        KcScore score = new KcScore(10, 3);
-        KcGame game = new KcGame(team1, team2, score);
+        Team team1 = new Team("A");
+        Team team2 = new Team("B", "C");
+        Score score = new Score(10, 3);
+        Game game = new Game(team1, team2, score);
         mvc.perform(post("/game/new")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(game)))

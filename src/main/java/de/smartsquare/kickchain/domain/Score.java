@@ -1,15 +1,15 @@
 package de.smartsquare.kickchain.domain;
 
-public class KcScore {
+public class Score {
 
     int goals1;
 
     int goals2;
 
-    public KcScore() {
+    public Score() {
     }
 
-    public KcScore(int goals1, int goals2) {
+    public Score(int goals1, int goals2) {
         this.goals1 = goals1;
         this.goals2 = goals2;
     }

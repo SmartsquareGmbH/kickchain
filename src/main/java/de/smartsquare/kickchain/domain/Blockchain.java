@@ -4,27 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class KcFullChain {
+public class Blockchain {
 
-    private List<KcBlock> chain = new ArrayList<>();
+    private List<Block> chain = new ArrayList<>();
 
-    public KcFullChain() {
+    public Blockchain() {
     }
 
-    public List<KcBlock> getChain() {
+    public List<Block> getChain() {
         return chain;
     }
 
-    public void setChain(List<KcBlock> chain) {
+    public void setChain(List<Block> chain) {
         this.chain = chain;
     }
 
-    public int addBlock(KcBlock block) {
+    public int addBlock(Block block) {
         getChain().add(block);
         return getChain().size();
     }
 
-    public KcBlock lastBlock() throws NoSuchElementException {
+    public Block lastBlock() throws NoSuchElementException {
         if (chain.isEmpty()) {
             throw new NoSuchElementException("Chain is empty.");
         }

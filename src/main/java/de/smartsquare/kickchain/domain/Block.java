@@ -2,27 +2,27 @@ package de.smartsquare.kickchain.domain;
 
 import java.time.Instant;
 
-public class KcBlock {
+public class Block<T extends BlockContent> {
 
     private int index;
 
     private Instant timestamp;
 
-    private KcGame game;
+    private T blockContent;
 
     private long proof;
 
     private String previousHash;
 
-    public KcBlock(int index, Instant timestamp, KcGame game, long proof, String previousHash) {
+    public Block(int index, Instant timestamp, T blockContent, long proof, String previousHash) {
         this.index = index;
         this.timestamp = timestamp;
-        this.game = game;
+        this.blockContent = blockContent;
         this.proof = proof;
         this.previousHash = previousHash;
     }
 
-    private KcBlock() {
+    private Block() {
     }
 
     public int getIndex() {
@@ -33,8 +33,8 @@ public class KcBlock {
         return timestamp;
     }
 
-    public KcGame getGame() {
-        return game;
+    public T getBlockContent() {
+        return blockContent;
     }
 
     public long getProof() {

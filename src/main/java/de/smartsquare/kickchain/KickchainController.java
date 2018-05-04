@@ -1,8 +1,9 @@
 package de.smartsquare.kickchain;
 
-import de.smartsquare.kickchain.domain.KcFullChain;
-import de.smartsquare.kickchain.domain.KcGame;
+import de.smartsquare.kickchain.domain.Blockchain;
+import de.smartsquare.kickchain.domain.Game;
 import de.smartsquare.kickchain.service.ConsensusService;
+import de.smartsquare.kickchain.service.KickchainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class KickchainController {
 
     private final ConsensusService consensusService;
 
-    private KcFullChain kc;
+    private Blockchain kc;
 
     @Autowired
     public KickchainController(KickchainService kickchainService, ConsensusService consensusService) {
@@ -36,19 +37,19 @@ public class KickchainController {
         kc = kickchainService.create();
     }
 
-    private KcFullChain getCurrentChain() {
+    private Blockchain getCurrentChain() {
         return kc;
     }
 
     @PostMapping(value = "/game/new")
     @ResponseBody
-    public int newGame(@RequestBody KcGame game) throws KcException {
+    public int newGame(@RequestBody Game game) throws BlockchainException {
         return kickchainService.newGame(kc, game);
     }
 
     @GetMapping(value = "/chain")
     @ResponseBody
-    public KcFullChain fullChain() {
+    public Blockchain fullChain() {
         return kc;
     }
 
@@ -67,8 +68,8 @@ public class KickchainController {
 
     @GetMapping(value = "/nodes/resolve")
     @ResponseBody
-    public ResponseEntity<?> consensus() throws KcException {
-        KcFullChain resolvedChain = consensusService.resolveConflicts(getCurrentChain());
+    public ResponseEntity<?> consensus() throws BlockchainException {
+        Blockchain resolvedChain = consensusService.resolveConflicts(getCurrentChain());
         return ResponseEntity.ok(resolvedChain);
     }
 

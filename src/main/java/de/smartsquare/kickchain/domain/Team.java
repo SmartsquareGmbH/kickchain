@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class KcTeam {
+public class Team {
 
     private final List<String> players = new ArrayList<>();
 
-    public KcTeam() {
+    public Team() {
     }
 
-    public KcTeam(String... players) {
+    public Team(String... players) {
         this.players.addAll(Arrays.asList(players));
     }
 
