@@ -17,8 +17,8 @@ import java.time.Instant;
 public class KickchainService {
 
 
-    public Blockchain create() {
-        Blockchain fullChain = new Blockchain();
+    public Blockchain create(String name) {
+        Blockchain fullChain = new Blockchain(name);
         try {
             fullChain.addBlock(newBlock(100, "1", null, 1, null));
 
@@ -38,7 +38,7 @@ public class KickchainService {
         }
     }
 
-    public int newGame(Blockchain fullChain, Game game) throws BlockchainException {
+    public Blockchain newGame(Blockchain fullChain, Game game) throws BlockchainException {
 
         try {
             long proofOfWork = proofOfWork(lastProof(fullChain));
@@ -49,7 +49,7 @@ public class KickchainService {
             throw new BlockchainException("Unable to get proof of work", e);
         }
 
-        return fullChain.lastIndex();
+        return fullChain;
     }
 
 

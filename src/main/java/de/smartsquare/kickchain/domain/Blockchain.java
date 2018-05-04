@@ -6,9 +6,23 @@ import java.util.NoSuchElementException;
 
 public class Blockchain {
 
+    private String name;
+
     private List<Block> chain = new ArrayList<>();
 
     public Blockchain() {
+    }
+
+    public Blockchain(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<Block> getChain() {

@@ -6,6 +6,7 @@ import de.smartsquare.kickchain.domain.Game;
 import de.smartsquare.kickchain.domain.Score;
 import de.smartsquare.kickchain.domain.Team;
 import de.smartsquare.kickchain.service.ConsensusService;
+import de.smartsquare.kickchain.service.DatabaseService;
 import de.smartsquare.kickchain.service.KickchainService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,10 +24,8 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -45,10 +44,11 @@ public class KickchainControllerTest {
     @MockBean
     ConsensusService consensusService;
 
+    @MockBean
+    DatabaseService databaseService;
+
     @Test
     public void testNewGame() throws Exception {
-        Mockito.when(kickchainService.newGame(any(), any())).thenReturn(2);
-
         Team team1 = new Team("A");
         Team team2 = new Team("B", "C");
         Score score = new Score(10, 3);
@@ -56,8 +56,7 @@ public class KickchainControllerTest {
         mvc.perform(post("/game/new")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(game)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("2"));
+                .andExpect(status().isOk());
     }
 
     @Test
