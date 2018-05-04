@@ -76,10 +76,7 @@ public class KickchainService {
     public boolean validProof(long lastProof, long proof) throws NoSuchAlgorithmException {
         String guess = String.format("%d%d", lastProof, proof);
         String guessHash = MessageDigestUtils.sha256(Integer.toString(guess.hashCode()));
-        return guessHash.startsWith("000000");
+        return guessHash.startsWith("0000");
     }
-
-
-
 
 }

@@ -3,6 +3,7 @@ package de.smartsquare.kickchain.database;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import java.util.Objects;
 
 @Entity
@@ -12,6 +13,7 @@ public class BlockchainEntity {
     String name;
 
     @Column
+    @Lob
     String jsonBlockchain;
 
     public String getName() {
