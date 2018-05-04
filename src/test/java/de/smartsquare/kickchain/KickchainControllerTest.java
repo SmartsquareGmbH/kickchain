@@ -18,6 +18,7 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,8 +68,8 @@ public class KickchainControllerTest {
 
     @Test
     public void testResolve() throws Exception {
-      /*  mvc.perform(get("/nodes/resolve")
+        mvc.perform(get("/nodes/resolve")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());*/
+                .andExpect(status().isOk());
     }
 }

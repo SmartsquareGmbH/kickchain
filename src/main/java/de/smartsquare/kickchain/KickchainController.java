@@ -2,6 +2,7 @@ package de.smartsquare.kickchain;
 
 import de.smartsquare.kickchain.domain.KcFullChain;
 import de.smartsquare.kickchain.domain.KcGame;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -10,12 +11,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class KickchainController {
 
-    private Kickchain kc = new Kickchain();
+
+    @Autowired
+    private KickchainService kickchainService;
+
+    private KcFullChain kc;
+
+    @PostConstruct
+    public void init() {
+        kc = kickchainService.create();
+    }
 
 
     @PostMapping(value = "/game/new")

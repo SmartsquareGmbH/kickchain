@@ -1,26 +1,37 @@
 package de.smartsquare.kickchain.domain;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class KcFullChain {
 
-    private List<KcBlock> chain;
+    private List<KcBlock> chain = new ArrayList<>();
 
-    private int length;
-
-    private KcFullChain() {
-    }
-
-    public KcFullChain(List<KcBlock> chain) {
-        this.chain = chain;
-        length = chain.size();
+    public KcFullChain() {
     }
 
     public List<KcBlock> getChain() {
         return chain;
     }
 
-    public int getLength() {
-        return length;
+    public void setChain(List<KcBlock> chain) {
+        this.chain = chain;
+    }
+
+    public int addBlock(KcBlock block) {
+        getChain().add(block);
+        return getChain().size();
+    }
+
+    public KcBlock lastBlock() throws NoSuchElementException {
+        if (chain.isEmpty()) {
+            throw new NoSuchElementException("Chain is empty.");
+        }
+        return chain.get(chain.size() - 1);
+    }
+
+    public int lastIndex() {
+        return chain.size();
     }
 }
