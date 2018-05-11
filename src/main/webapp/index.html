@@ -1,0 +1,30 @@
+<html>
+
+<div id="app">
+
+    <ul>
+        <li v-for="c in chain">{{ c.blockContent }}</li>
+    </ul>
+</div>
+
+<script src="https://unpkg.com/vue"></script>
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            chain: []
+        },
+        created() {
+            fetch('http://localhost:8080/chain')
+                .then(response = > response.json()
+        )
+        .
+            then(json = > {
+                this.chain = json.chain
+        })
+        }
+    })
+</script>
+
+
+</html>
