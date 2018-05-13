@@ -1,19 +1,56 @@
 <html>
 
+<head>
+    <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+</head>
+
 <div id="app">
-    <h2>Team 1</h2>
-    <input type="text" v-model="input.team1.players[0]" placeholder="Player 1"/>
-    <input type="text" v-model="input.team1.players[1]" placeholder="Player 2"/>
-    <input type="number" v-model="input.score.goals1" placeholder="Punkte"/>
-    <br/>
-    <h2>Team 2</h2>
-    <input type="text" v-model="input.team2.players[0]" placeholder="Player 1"/>
-    <input type="text" v-model="input.team2.players[1]" placeholder="Player 2"/>
-    <input type="number" v-model="input.score.goals2" placeholder="Punkte"/>
-    <br/> <br/> <br/>
-    <button v-on:click="sendData()">Send</button>
-    <br/>
-    <br/>
+
+    <div class="grid">
+        <div class="row">
+            <div class="cell-sm-full cell-md-one-half cell-lg-6">
+                <div class="form-group">
+                    <h2>Team 1</h2>
+                </div>
+                <div class="form-group">
+                    <label>Player 1</label>
+                    <input type="text" v-model="input.team1.players[0]" placeholder="Player 1"/>
+                </div>
+                <div class="form-group">
+                    <label>Player 2</label>
+                    <input type="text" v-model="input.team1.players[1]" placeholder="Player 2"/>
+                </div>
+                <div class="form-group">
+                    <label>Scores</label>
+                    <input type="number" min="0" max="10" v-model="input.score.goals1" placeholder="Punkte"/>
+                </div>
+            </div>
+            <div class="cell-sm-full cell-md-one-half cell-lg-6">
+                <div class="form-group">
+                    <h2>Team 2</h2>
+                </div>
+                <div class="form-group">
+                    <label>Player 1</label>
+                    <input type="text" v-model="input.team2.players[0]" placeholder="Player 1"/>
+                </div>
+                <div class="form-group">
+                    <label>Player 2</label>
+                    <input type="text" v-model="input.team2.players[1]" placeholder="Player 2"/>
+                </div>
+                <div class="form-group">
+                    <label>Scores</label>
+                    <input type="number" min="0" max="10" v-model="input.score.goals2" placeholder="Punkte"/>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="cell-sm-full cell-md-full cell-lg-12" style="padding-top: 25px!important;">
+                <button class="button success large" v-on:click="sendData()" style="width: 100%;">save</button>
+            </div>
+        </div>
+
+    </div>
+
     <h2>Current Blockchain</h2>
     <ul>
         <li v-for="c in chain">{{ c.blockContent }}</li>
@@ -39,20 +76,22 @@
         created() {
             fetch('http://localhost:8080/chain')
                 .then(response => response.json())
-        .then(data => {this.chain = data.chain})
+        .then(data => {this.chain = data.chain.filter(function (block) {
+                return block.blockContent !=null
+            })})
         },
         methods: {
             sendData() {
                 fetch('http://localhost:8080/game/new', {
                     method: 'POST',
-                    headers : {
+                    headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(this.input),
                 }).then((res) => res.json())
-            .then((data) => this.chain=data.chain)
-            .catch((err)=> console.log(err))
+            .then((data) => this.chain = data.chain)
+            .catch((err) => console.log(err))
             }
         }
     })
