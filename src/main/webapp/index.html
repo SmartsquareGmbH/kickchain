@@ -69,16 +69,18 @@
                 team2: {players: []},
                 score: {
                     goals1: 0,
-                    goals2: 0,
+                    goals2: 0
                 }
             }
         },
         created() {
             fetch('http://localhost:8080/chain')
                 .then(response => response.json())
-        .then(data => {this.chain = data.chain.filter(function (block) {
-                return block.blockContent !=null
-            })})
+                .then(data => {
+                    this.chain = data.chain.filter(function (block) {
+                        return block.blockContent != null
+                    })
+                })
         },
         methods: {
             sendData() {
@@ -90,8 +92,8 @@
                     },
                     body: JSON.stringify(this.input),
                 }).then((res) => res.json())
-            .then((data) => this.chain = data.chain)
-            .catch((err) => console.log(err))
+                    .then((data) => this.chain = data.chain)
+                    .catch((err) => console.log(err))
             }
         }
     })
