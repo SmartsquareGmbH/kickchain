@@ -1,6 +1,13 @@
 package de.smartsquare.kickchain.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.smartsquare.kickchain.MessageDigestUtils;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.List;
 
 public class Block<T extends BlockContent> {
 
@@ -8,13 +15,13 @@ public class Block<T extends BlockContent> {
 
     private Instant timestamp;
 
-    private T blockContent;
+    private List<T> blockContent;
 
     private long proof;
 
     private String previousHash;
 
-    public Block(int index, Instant timestamp, T blockContent, long proof, String previousHash) {
+    public Block(int index, Instant timestamp, List<T> blockContent, long proof, String previousHash) {
         this.index = index;
         this.timestamp = timestamp;
         this.blockContent = blockContent;
@@ -33,7 +40,7 @@ public class Block<T extends BlockContent> {
         return timestamp;
     }
 
-    public T getBlockContent() {
+    public List<T> getBlockContent() {
         return blockContent;
     }
 
@@ -43,6 +50,13 @@ public class Block<T extends BlockContent> {
 
     public String getPreviousHash() {
         return previousHash;
+    }
+
+    public String toHash() throws IOException, NoSuchAlgorithmException {
+        ObjectMapper mapper = new ObjectMapper();
+        StringWriter writer = new StringWriter();
+        mapper.writeValue(writer, this);
+        return MessageDigestUtils.sha256(writer.toString());
     }
 
 }

@@ -3,6 +3,8 @@ package de.smartsquare.kickchain.service;
 import de.smartsquare.kickchain.BlockchainException;
 import de.smartsquare.kickchain.domain.Block;
 import de.smartsquare.kickchain.domain.Blockchain;
+import de.smartsquare.kickchain.domain.Proof;
+import de.smartsquare.kickchain.domain.ZeroPaddedHashProof;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +19,13 @@ import java.util.Set;
 @Service
 public class ConsensusService {
 
-    private final KickchainService kickchainService;
+    private final Proof<Boolean> proof;
 
     private Set<String> nodes = new HashSet<>();
 
     @Autowired
-    public ConsensusService(KickchainService kickchainService) {
-        this.kickchainService = kickchainService;
+    public ConsensusService(ZeroPaddedHashProof proof) {
+        this.proof = proof;
     }
 
     public void registerNode(String address) {
@@ -38,10 +40,10 @@ public class ConsensusService {
                 System.out.println(latestBlock);
                 System.out.println(current);
 
-                if (!mine.lastBlock().getPreviousHash().equals(kickchainService.hashBlock(latestBlock))) {
+                if (!mine.lastBlock().getPreviousHash().equals(latestBlock.toHash())) {
                     return false;
                 }
-                if (!kickchainService.validProof(latestBlock.getProof(), current.getProof())) {
+                if (!proof.apply(latestBlock.getProof(), current.getProof())) {
                     return false;
                 }
                 latestBlock = current;
