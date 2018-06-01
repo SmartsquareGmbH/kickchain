@@ -3,6 +3,7 @@ package de.smartsquare.kickchain.domain;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Team {
 
@@ -17,6 +18,19 @@ public class Team {
 
     public List<String> getPlayers() {
         return players;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Team team = (Team) o;
+        return Objects.equals(players, team.players);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(players);
     }
 
 }

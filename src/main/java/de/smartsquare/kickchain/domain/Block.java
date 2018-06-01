@@ -12,14 +12,12 @@ import java.util.List;
 public class Block<T extends BlockContent> {
 
     private int index;
-
     private Instant timestamp;
+    private String previousHash;
 
     private List<T> blockContent;
 
     private long proof;
-
-    private String previousHash;
 
     public Block(int index, Instant timestamp, List<T> blockContent, long proof, String previousHash) {
         this.index = index;

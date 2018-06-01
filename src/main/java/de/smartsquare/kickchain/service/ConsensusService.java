@@ -6,22 +6,36 @@ import de.smartsquare.kickchain.domain.Blockchain;
 import de.smartsquare.kickchain.domain.Proof;
 import de.smartsquare.kickchain.domain.ZeroPaddedHashProof;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 @Service
 public class ConsensusService {
 
+    @Value("${consensus.peers}")
+    private String peers; // comma separated list of known peers
+
     private final Proof<Boolean> proof;
 
     private Set<String> nodes = new HashSet<>();
+
+    @PostConstruct
+    public void postConstruct() {
+        if (!StringUtils.isEmpty(peers)) {
+            nodes.addAll(Arrays.asList(peers.split(",")));
+        }
+    }
 
     @Autowired
     public ConsensusService(ZeroPaddedHashProof proof) {
@@ -37,9 +51,6 @@ public class ConsensusService {
             Block latestBlock = their.lastBlock();
 
             for (Block current : their.getChain()) {
-                System.out.println(latestBlock);
-                System.out.println(current);
-
                 if (!mine.lastBlock().getPreviousHash().equals(latestBlock.toHash())) {
                     return false;
                 }

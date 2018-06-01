@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Set;
 
 @Controller
 public class KickchainController {
@@ -103,6 +104,13 @@ public class KickchainController {
     public ResponseEntity<?> consensus() throws BlockchainException {
         Blockchain resolvedChain = consensusService.resolveConflicts(getCurrentChain());
         return ResponseEntity.ok(resolvedChain);
+    }
+
+    @GetMapping(value = "/nodes/list")
+    @ResponseBody
+    public ResponseEntity<?> listNodes() throws BlockchainException {
+        Set<String> nodes = consensusService.getNodes();
+        return ResponseEntity.ok(nodes);
     }
 
 }
