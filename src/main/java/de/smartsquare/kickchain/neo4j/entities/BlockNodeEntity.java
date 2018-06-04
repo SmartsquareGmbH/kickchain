@@ -1,10 +1,12 @@
 package de.smartsquare.kickchain.neo4j.entities;
 
+import de.smartsquare.kickchain.domain.BlockContent;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import java.time.Instant;
+import java.util.List;
 
 @NodeEntity
 public class BlockNodeEntity {
@@ -20,6 +22,11 @@ public class BlockNodeEntity {
     private String previousHash;
 
     private long proof;
+
+    private List<BlockContent> content;
+
+    private BlockNodeEntity nextBlock;
+
 
     public Long getId() {
         return id;
@@ -59,6 +66,22 @@ public class BlockNodeEntity {
 
     public void setProof(long proof) {
         this.proof = proof;
+    }
+
+    public List<BlockContent> getContent() {
+        return content;
+    }
+
+    public void setContent(List<BlockContent> content) {
+        this.content = content;
+    }
+
+    public BlockNodeEntity getNextBlock() {
+        return nextBlock;
+    }
+
+    public void setNextBlock(BlockNodeEntity nextBlock) {
+        this.nextBlock = nextBlock;
     }
 
     @Override

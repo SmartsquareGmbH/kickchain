@@ -5,6 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface BlockRepository extends CrudRepository<BlockNodeEntity, Long> {
 
-    BlockNodeEntity findByIndex(int index);
 
 }
