@@ -1,8 +1,7 @@
 package de.smartsquare.kickchain;
 
-import org.neo4j.ogm.config.ClasspathConfigurationSource;
-import org.neo4j.ogm.config.ConfigurationSource;
 import org.neo4j.ogm.session.SessionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -16,17 +15,19 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class Neo4jConf {
 
+    @Value("${neo4j.uri}")
+    private String uri;
+
     @Bean
     public SessionFactory sessionFactory() {
-        // with domain entity base package(s)
         return new SessionFactory(configuration(), "de.smartsquare.kickchain.neo4j.entities");
     }
 
     @Bean
     public org.neo4j.ogm.config.Configuration configuration() {
-        ConfigurationSource properties = new ClasspathConfigurationSource("ogm.properties");
-        org.neo4j.ogm.config.Configuration configuration = new org.neo4j.ogm.config.Configuration.Builder(properties).build();
-        return configuration;
+        return new org.neo4j.ogm.config.Configuration.Builder()
+                .uri(uri)
+                .build();
     }
 
     @Bean
