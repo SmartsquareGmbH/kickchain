@@ -27,5 +27,5 @@ Install and setup a Neo4j server.
 ### Docker
 
     $ docker build . -t kickchain
-    $ docker run kickchain
+    $ docker run -p 8080:8080 kickchain
     
