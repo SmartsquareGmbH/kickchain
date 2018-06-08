@@ -2,14 +2,16 @@ package de.smartsquare.kickchain.neo4j.entities;
 
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Property;
 
 @NodeEntity
-public class BlockchainNodeEntity {
+public class PlayerNodeEntity {
 
     @Id
     private String name;
 
-    private BlockNodeEntity genesisNode;
+    @Property
+    private String publicKey;
 
     public String getName() {
         return name;
@@ -19,19 +21,19 @@ public class BlockchainNodeEntity {
         this.name = name;
     }
 
-    public BlockNodeEntity getGenesisNode() {
-        return genesisNode;
+    public String getPublicKey() {
+        return publicKey;
     }
 
-    public void setGenesisNode(BlockNodeEntity genesisNode) {
-        this.genesisNode = genesisNode;
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 
     @Override
     public String toString() {
-        return "BlockchainNodeEntity{" +
-                "name='" + name + '\'' +
-                ", genesisNode=" + genesisNode +
+        return "PlayerNodeEntity{" +
+                ", name='" + name + '\'' +
+                ", publicKey='" + publicKey + '\'' +
                 '}';
     }
 }

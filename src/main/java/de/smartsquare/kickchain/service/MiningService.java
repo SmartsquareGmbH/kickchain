@@ -16,19 +16,17 @@ public class MiningService {
         this.proof = zeroPaddedHashProof;
     }
 
-    public <T extends BlockContent> Blockchain mine(Blockchain currentChain, List<T> transactions) throws BlockchainException {
+    public <T extends BlockContent> Block<T> mine(Block lastBlock, List<T> transactions) throws BlockchainException {
         try {
-            Block lastBlock = currentChain.lastBlock();
             long proofOfWork = proofOfWork(lastBlock.getProof());
             String previousHash = lastBlock.toHash();
             Block<T> block = new Block<>(
-                    currentChain.lastIndex(),
+                    lastBlock.getIndex() + 1,
                     Instant.now(),
                     transactions,
                     proofOfWork,
                     previousHash);
-            currentChain.addBlock(block);
-            return currentChain;
+            return block;
         } catch (Exception e) {
             throw new BlockchainException("Unable to get proof of work", e);
         }

@@ -1,12 +1,17 @@
 package de.smartsquare.kickchain.neo4j.entities;
 
-import de.smartsquare.kickchain.domain.BlockContent;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.smartsquare.kickchain.MessageDigestUtils;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.List;
 
 @NodeEntity
 public class BlockNodeEntity {
@@ -15,18 +20,20 @@ public class BlockNodeEntity {
     @GeneratedValue
     private Long id;
 
-    private int index;
+    private long index;
+
+    private String blockchain;
 
     private Instant timestamp;
 
-    private String previousHash;
-
     private long proof;
 
-    private List<BlockContent> content;
+    @Relationship(type = "HASGAME", direction = "INCOMING")
+    HasGamesRelationshipEntity game;
 
-    private BlockNodeEntity nextBlock;
-
+    @JsonIgnore
+    @Relationship(type = "FOLLOWS", direction = "INCOMING")
+    FollowsRelationshipEntity follows;
 
     public Long getId() {
         return id;
@@ -36,12 +43,20 @@ public class BlockNodeEntity {
         this.id = id;
     }
 
-    public int getIndex() {
+    public long getIndex() {
         return index;
     }
 
-    public void setIndex(int index) {
+    public void setIndex(long index) {
         this.index = index;
+    }
+
+    public String getBlockchain() {
+        return blockchain;
+    }
+
+    public void setBlockchain(String blockchain) {
+        this.blockchain = blockchain;
     }
 
     public Instant getTimestamp() {
@@ -52,14 +67,6 @@ public class BlockNodeEntity {
         this.timestamp = timestamp;
     }
 
-    public String getPreviousHash() {
-        return previousHash;
-    }
-
-    public void setPreviousHash(String previousHash) {
-        this.previousHash = previousHash;
-    }
-
     public long getProof() {
         return proof;
     }
@@ -68,20 +75,28 @@ public class BlockNodeEntity {
         this.proof = proof;
     }
 
-    public List<BlockContent> getContent() {
-        return content;
+
+    public FollowsRelationshipEntity getFollows() {
+        return follows;
     }
 
-    public void setContent(List<BlockContent> content) {
-        this.content = content;
+    public void setFollows(FollowsRelationshipEntity follows) {
+        this.follows = follows;
     }
 
-    public BlockNodeEntity getNextBlock() {
-        return nextBlock;
+    public HasGamesRelationshipEntity getGame() {
+        return game;
     }
 
-    public void setNextBlock(BlockNodeEntity nextBlock) {
-        this.nextBlock = nextBlock;
+    public void setGame(HasGamesRelationshipEntity game) {
+        this.game = game;
+    }
+
+    public String toHash() throws IOException, NoSuchAlgorithmException {
+        ObjectMapper mapper = new ObjectMapper();
+        StringWriter writer = new StringWriter();
+        mapper.writeValue(writer, this);
+        return MessageDigestUtils.sha256(writer.toString());
     }
 
     @Override
@@ -89,9 +104,11 @@ public class BlockNodeEntity {
         return "BlockNodeEntity{" +
                 "id=" + id +
                 ", index=" + index +
+                ", blockchain='" + blockchain + '\'' +
                 ", timestamp=" + timestamp +
-                ", previousHash='" + previousHash + '\'' +
                 ", proof=" + proof +
+                ", follows=" + follows +
                 '}';
     }
+
 }

@@ -1,5 +1,6 @@
 package de.smartsquare.kickchain;
 
+import de.smartsquare.kickchain.domain.Block;
 import de.smartsquare.kickchain.domain.Blockchain;
 import de.smartsquare.kickchain.domain.Game;
 import de.smartsquare.kickchain.service.ConsensusService;
@@ -13,20 +14,19 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @Controller
 public class KickchainController {
 
 
+    public static final String KICKCHAIN = "Kickchain";
     private final KickchainService kickchainService;
 
     private final ConsensusService consensusService;
 
     private final DatabaseService databaseService;
-
-    private Blockchain blockchain;
 
     @Autowired
     public KickchainController(KickchainService kickchainService, ConsensusService consensusService, DatabaseService databaseService) {
@@ -37,53 +37,50 @@ public class KickchainController {
 
     @PostConstruct
     public void init() {
+        Blockchain blockchain = null;
         try {
-            blockchain = databaseService.loadBlockchain("Kickchain");
+            blockchain = databaseService.loadBlockchain(KICKCHAIN);
         } catch (Exception e) {
             e.printStackTrace();
         }
         if (blockchain == null) {
-            blockchain = kickchainService.create("Kickchain");
-            try {
-                databaseService.saveBlockchain(blockchain);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            newChain(KICKCHAIN);
         }
-    }
-
-    private Blockchain getCurrentChain() {
-        return blockchain;
     }
 
     @PostMapping(value = "/game/new")
     @ResponseBody
     public Blockchain newGame(@RequestBody Game game) throws BlockchainException {
-        Blockchain blockchain = kickchainService.newGame(this.blockchain, game);
-        try {
-            databaseService.saveBlockchain(blockchain);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return blockchain;
+        Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
+        Block newBlock = kickchainService.newGame(blockchain.lastBlock(), game);
+        databaseService.addBlock(blockchain.getName(), newBlock);
+        return databaseService.loadBlockchain(blockchain.getName());
+    }
+
+    @GetMapping(value = "/player/list")
+    @ResponseBody
+    public List<String> playerNames() {
+        return databaseService.playerNames();
+    }
+
+    @GetMapping(value = "/player/{name}/pubkey")
+    @ResponseBody
+    public String playerPublicKey(@PathVariable("name") String name) {
+        return databaseService.getPublicKeyByPlayerName(name);
     }
 
     @GetMapping(value = "/chain")
     @ResponseBody
     public Blockchain fullChain() {
-        return blockchain;
+        return databaseService.loadBlockchain(KICKCHAIN);
     }
 
     @GetMapping(value = "/chain/new/{name}")
     @ResponseBody
     public Blockchain newChain(@PathVariable("name") String name) {
-        Blockchain blockchain = kickchainService.create(name);
-        try {
-            databaseService.saveBlockchain(blockchain);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return blockchain;
+        Block genesisBlock = kickchainService.create(name);
+        databaseService.createBlockchain(name, genesisBlock);
+        return databaseService.loadBlockchain(name);
     }
 
 
@@ -102,7 +99,8 @@ public class KickchainController {
     @GetMapping(value = "/nodes/resolve")
     @ResponseBody
     public ResponseEntity<?> consensus() throws BlockchainException {
-        Blockchain resolvedChain = consensusService.resolveConflicts(getCurrentChain());
+        Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
+        Blockchain resolvedChain = consensusService.resolveConflicts(blockchain);
         return ResponseEntity.ok(resolvedChain);
     }
 

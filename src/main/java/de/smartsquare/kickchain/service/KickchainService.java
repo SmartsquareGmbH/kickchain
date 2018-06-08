@@ -19,14 +19,14 @@ public class KickchainService {
     }
 
 
-    public Blockchain create(String name) {
-        Blockchain fullChain = new Blockchain(name);
-        fullChain.addBlock(new Block(1, Instant.now(), null, 100, "1"));
-        return fullChain;
+    public Block create(String name) {
+        Block block = new Block(1, Instant.now(), null, 100, "1");
+        return block;
     }
 
-    public Blockchain newGame(Blockchain fullChain, Game game) throws BlockchainException {
-        return miningService.mine(fullChain, Collections.singletonList(game));
+    public Block newGame(Block lastBlock, Game game) throws BlockchainException {
+        Block<Game> minedBlock = miningService.mine(lastBlock, Collections.singletonList(game));
+        return minedBlock;
     }
 
 }

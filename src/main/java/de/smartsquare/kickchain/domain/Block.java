@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Block<T extends BlockContent> {
 
-    private int index;
+    private long index;
     private Instant timestamp;
     private String previousHash;
 
@@ -19,7 +19,7 @@ public class Block<T extends BlockContent> {
 
     private long proof;
 
-    public Block(int index, Instant timestamp, List<T> blockContent, long proof, String previousHash) {
+    public Block(long index, Instant timestamp, List<T> blockContent, long proof, String previousHash) {
         this.index = index;
         this.timestamp = timestamp;
         this.blockContent = blockContent;
@@ -30,7 +30,7 @@ public class Block<T extends BlockContent> {
     private Block() {
     }
 
-    public int getIndex() {
+    public long getIndex() {
         return index;
     }
 

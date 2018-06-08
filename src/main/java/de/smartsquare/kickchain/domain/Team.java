@@ -16,6 +16,10 @@ public class Team {
         this.players.addAll(Arrays.asList(players));
     }
 
+    public Team(List<String> players) {
+        this.players.addAll(players);
+    }
+
     public List<String> getPlayers() {
         return players;
     }

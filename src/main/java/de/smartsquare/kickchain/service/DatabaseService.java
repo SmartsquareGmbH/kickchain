@@ -1,94 +1,217 @@
 package de.smartsquare.kickchain.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.smartsquare.kickchain.domain.Block;
-import de.smartsquare.kickchain.neo4j.entities.BlockNodeEntity;
-import de.smartsquare.kickchain.neo4j.entities.BlockchainNodeEntity;
-import de.smartsquare.kickchain.neo4j.repository.BlockRepository;
-import de.smartsquare.kickchain.domain.Blockchain;
-import de.smartsquare.kickchain.neo4j.repository.BlockchainRepository;
+import de.smartsquare.kickchain.BlockchainException;
+import de.smartsquare.kickchain.domain.*;
+import de.smartsquare.kickchain.neo4j.entities.*;
+import de.smartsquare.kickchain.neo4j.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DatabaseService {
 
     private final BlockRepository blockRepository;
-    private final BlockchainRepository blockchainRepository;
+    private final FollowsRepository followsRepository;
+    private final PlayerRepository playerRepository;
+    private final HasGameRepository hasGameRepository;
+    private final GameRepository gameRepository;
 
     private final ObjectMapper mapper;
 
     @Autowired
-    public DatabaseService(BlockRepository blockRepository, BlockchainRepository blockchainRepository, ObjectMapper mapper) {
+    public DatabaseService(BlockRepository blockRepository,
+                           FollowsRepository followsRepository,
+                           PlayerRepository playerRepository,
+                           GameRepository gameRepository,
+                           HasGameRepository hasGameRepository,
+                           ObjectMapper mapper) {
         this.blockRepository = blockRepository;
-        this.blockchainRepository = blockchainRepository;
+        this.followsRepository = followsRepository;
+        this.playerRepository = playerRepository;
+        this.gameRepository = gameRepository;
+        this.hasGameRepository = hasGameRepository;
         this.mapper = mapper;
     }
 
-    public void createBlockchain(String name, Block genesisBlock) {
-        BlockNodeEntity blockNodeEntity = getBlockNodeEntity(genesisBlock);
-
-        BlockchainNodeEntity blockchainNodeEntity = new BlockchainNodeEntity();
-        blockchainNodeEntity.setName(name);
-        blockchainNodeEntity.setGenesisNode(blockNodeEntity);
-        BlockchainNodeEntity save = blockchainRepository.save(blockchainNodeEntity);
+    public void createPlayer(String name, String publicKey) {
+        PlayerNodeEntity playerNodeEntity = new PlayerNodeEntity();
+        playerNodeEntity.setName(name);
+        playerNodeEntity.setPublicKey(publicKey);
+        playerRepository.save(playerNodeEntity);
     }
 
-    private BlockNodeEntity getBlockNodeEntity(Block genesisBlock) {
+    public String getPublicKeyByPlayerName(String name) {
+        return playerRepository.findByName(name).getPublicKey();
+    }
+
+    public List<String> playerNames() {
+        List<String> names = new ArrayList<>();
+        playerRepository.findAll().forEach(p -> names.add(p.getName()));
+        return names;
+    }
+
+    public void createBlockchain(String name, Block genesisBlock) {
+        // TODO implement check whether chain already exists
+        BlockNodeEntity blockNodeEntity = getBlockNodeEntity(name, genesisBlock);
+        blockRepository.save(blockNodeEntity);
+    }
+
+    private BlockNodeEntity getBlockNodeEntity(String blockchain, Block block) {
         BlockNodeEntity blockNodeEntity = new BlockNodeEntity();
-        blockNodeEntity.setIndex(genesisBlock.getIndex());
-        blockNodeEntity.setPreviousHash(genesisBlock.getPreviousHash());
-        blockNodeEntity.setProof(genesisBlock.getProof());
-        blockNodeEntity.setTimestamp(genesisBlock.getTimestamp());
-        blockNodeEntity.setContent(genesisBlock.getBlockContent());
-        blockNodeEntity.setNextBlock(null);
+        blockNodeEntity.setProof(block.getProof());
+        blockNodeEntity.setTimestamp(block.getTimestamp());
+        blockNodeEntity.setBlockchain(blockchain);
+        blockNodeEntity.setIndex(block.getIndex());
+
         return blockNodeEntity;
     }
 
-    public void addBlock(String name, Block block) {
-
-        BlockchainNodeEntity byName = blockchainRepository.findByName(name);
-        BlockNodeEntity blockNode = byName.getGenesisNode();
-        while (blockNode.getNextBlock() != null) {
-            blockNode = blockNode.getNextBlock();
+    private List<GameNodeEntity> getGameNodeEntity(List<BlockContent> blockContent) {
+        if (blockContent == null) {
+            return null;
+        } else {
+            return blockContent.stream()
+                    .map(this::getGameNodeEntity)
+                    .collect(Collectors.toList());
         }
-
-        BlockNodeEntity blockNodeEntity = getBlockNodeEntity(block);
-        blockNode.setNextBlock(blockNodeEntity);
-        blockRepository.save(blockNode);
     }
 
-    public Blockchain loadBlockchain(String name) throws IOException {
-//        BlockchainEntity blockchainEntity = repository.fgetOne(name);
-//        Blockchain blockchain = mapper.readValue(blockchainEntity.getJsonBlockchain(), Blockchain.class);
-        BlockchainNodeEntity byName = blockchainRepository.findByName(name);
-        Blockchain blockchain = new Blockchain(name);
+    private GameNodeEntity getGameNodeEntity(BlockContent blockContent) {
+        if (blockContent instanceof Game) {
+            Game game =  (Game) blockContent;
 
-        BlockNodeEntity bne = byName.getGenesisNode();
-        while (bne != null) {
-            Block block = new Block(bne.getIndex(), bne.getTimestamp(), bne.getContent(), bne.getProof(), bne.getPreviousHash());
+            List<PlayerNodeEntity> team1 = game.getTeam1().getPlayers().stream()
+                    .map(playerRepository::findByName)
+                    .collect(Collectors.toList());
+            List<PlayerNodeEntity> team2 = game.getTeam2().getPlayers().stream()
+                    .map(playerRepository::findByName)
+                    .collect(Collectors.toList());
+
+            GameNodeEntity gameNodeEntity = new GameNodeEntity();
+            gameNodeEntity.setCreated(Instant.now());
+            gameNodeEntity.setScore1(game.getScore().getGoals1());
+            gameNodeEntity.setScore2(game.getScore().getGoals2());
+
+            gameNodeEntity.setTeam1(game.getTeam1().getPlayers());
+            gameNodeEntity.setTeam2(game.getTeam2().getPlayers());
+
+            return gameNodeEntity;
+        }
+        throw new RuntimeException("Only BlockContent of type Game allowed yet.");
+    }
+
+    public void addBlock(String name, Block block) throws BlockchainException {
+        BlockNodeEntity lastBlock = blockRepository.findByBlockchain(name).stream()
+                .sorted((c1, c2) -> (int) (c2.getIndex() - c1.getIndex()))
+                .findFirst()
+                .get();
+
+//        List<Game> games = getGames(lastBlock.getGames());
+//        Block b = new Block(lastBlock.getIndex(), lastBlock.getTimestamp(), games, lastBlock.getProof(), "1" );
+
+
+        BlockNodeEntity newBlock = getBlockNodeEntity(name, block);
+
+        FollowsRelationshipEntity follows = new FollowsRelationshipEntity();
+        follows.setCreated(Instant.now());
+        follows.setEndBlock(newBlock);
+        follows.setStartBlock(lastBlock);
+        try {
+            follows.setHash(lastBlock.toHash());
+        } catch (IOException|NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new BlockchainException("Unable to compute block hash.");
+        }
+
+        List<GameNodeEntity> gameNodeEntity = getGameNodeEntity(block.getBlockContent());
+
+        if (gameNodeEntity != null) {
+            HasGamesRelationshipEntity hasGamesRelationshipEntity = new HasGamesRelationshipEntity();
+            GameNodeEntity endGame = gameNodeEntity.get(0);
+            endGame = gameRepository.save(endGame);
+
+            hasGamesRelationshipEntity.setEndGame(endGame);
+            hasGamesRelationshipEntity.setStartBlock(newBlock);
+            newBlock.setGame(hasGamesRelationshipEntity);
+            hasGameRepository.save(hasGamesRelationshipEntity);
+        }
+
+
+
+        newBlock.setFollows(follows);
+
+
+        followsRepository.save(follows);
+        BlockNodeEntity save = blockRepository.save(newBlock);
+        System.out.println("Save: " + save);
+    }
+
+    private List<Game> getGamesRE(List<HasGamesRelationshipEntity> gameNodeEntities) {
+        return gameNodeEntities == null ? null : gameNodeEntities.stream()
+                .map(g -> g.getEndGame())
+                .map(this::getGame)
+                .collect(Collectors.toList());
+    }
+
+    private List<Game> getGames(List<GameNodeEntity> gameNodeEntities) {
+        return gameNodeEntities == null ? null : gameNodeEntities.stream()
+                .map(this::getGame)
+                .collect(Collectors.toList());
+    }
+
+    private Game getGame(HasGamesRelationshipEntity hasGamesRelationshipEntity) {
+
+        return (hasGamesRelationshipEntity == null || hasGamesRelationshipEntity.getEndGame() == null)
+                ? null : getGame(hasGamesRelationshipEntity.getEndGame());
+    }
+
+    private Game getGame(GameNodeEntity g) {
+        System.out.println("g is " + g);
+        return g == null || g.getTeam1() == null || g.getTeam2() == null ? null :
+        new Game(
+                new Team(g.getTeam1()),
+                new Team(g.getTeam2()),
+//                new Team(g.getTeam1().stream().map(PlayerNodeEntity::getName).collect(Collectors.toList())),
+//                new Team(g.getTeam2().stream().map(PlayerNodeEntity::getName).collect(Collectors.toList())),
+                new Score(g.getScore1(), g.getScore2())
+        );
+    }
+
+    public Blockchain loadBlockchain(String name) {
+
+        List<BlockNodeEntity> byBlockchain = blockRepository.findByBlockchain(name).stream()
+                .sorted((c1, c2) -> (int) (c1.getIndex() - c2.getIndex()))
+                .collect(Collectors.toList());
+        if (byBlockchain.isEmpty()) return null;
+
+        Blockchain blockchain = new Blockchain(name);
+        for (BlockNodeEntity bne : byBlockchain) {
+            String prevHash = bne.getFollows() != null ? bne.getFollows().getHash() : null;
+            List<Game> games = bne.getGame() == null ? null : Arrays.asList(getGame(bne.getGame()));
+            Block block = new Block(bne.getIndex(), bne.getTimestamp(), games, bne.getProof(),  prevHash);
             blockchain.addBlock(block);
-            bne = bne.getNextBlock();
         }
 
         return blockchain;
     }
 
+
     public void deleteBlockchain(String name) {
-        blockchainRepository.deleteById(name);
+        followsRepository.deleteAll();
+        blockRepository.deleteAll();
     }
 
-    public void saveBlockchain(Blockchain blockchain) throws IOException {
-//        StringWriter writer = new StringWriter();
-//        mapper.writeValue(writer, blockchain);
-//
-//        BlockchainEntity blockchainEntity = new BlockchainEntity();
-//        blockchainEntity.setName(blockchain.getName());
-//        blockchainEntity.setJsonBlockchain(writer.toString());
-//
-//        repository.save(blockchainEntity);
+    public void deletePlayer(String name) {
+        playerRepository.deleteById(name);
     }
 
 }
