@@ -32,7 +32,7 @@ public class BlockNodeEntity {
     HasGamesRelationshipEntity game;
 
     @JsonIgnore
-    @Relationship(type = "FOLLOWS", direction = "INCOMING")
+    @Relationship(type = "FOLLOWS")
     FollowsRelationshipEntity follows;
 
     public Long getId() {

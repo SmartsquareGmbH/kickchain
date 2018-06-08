@@ -14,7 +14,7 @@ public interface BlockRepository extends CrudRepository<BlockNodeEntity, Long> {
     @Query("match (b:BlockNodeEntity) return b order by (b.proof) asc limit 1")
     BlockNodeEntity findStartByBlockchain(@Param("blockchain") String blockchain);
 
-    @Query("match (b:BlockNodeEntity) return b order by (b.proof) desc limit 1")
+    @Query("match (n:BlockNodeEntity {blockchain:{blockchain}}) where not (n)<-[:FOLLOWS]-() return n")
     BlockNodeEntity findEndByBlockchain(@Param("blockchain") String blockchain);
 
 }

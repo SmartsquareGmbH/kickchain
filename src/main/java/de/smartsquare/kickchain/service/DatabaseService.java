@@ -110,49 +110,46 @@ public class DatabaseService {
     }
 
     public void addBlock(String name, Block block) throws BlockchainException {
-        BlockNodeEntity lastBlock = blockRepository.findByBlockchain(name).stream()
-                .sorted((c1, c2) -> (int) (c2.getIndex() - c1.getIndex()))
-                .findFirst()
-                .get();
-
-//        List<Game> games = getGames(lastBlock.getGames());
-//        Block b = new Block(lastBlock.getIndex(), lastBlock.getTimestamp(), games, lastBlock.getProof(), "1" );
-
-
+        BlockNodeEntity lastBlock = blockRepository.findEndByBlockchain(name);
         BlockNodeEntity newBlock = getBlockNodeEntity(name, block);
 
-        FollowsRelationshipEntity follows = new FollowsRelationshipEntity();
-        follows.setCreated(Instant.now());
-        follows.setEndBlock(newBlock);
-        follows.setStartBlock(lastBlock);
-        try {
-            follows.setHash(lastBlock.toHash());
-        } catch (IOException|NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new BlockchainException("Unable to compute block hash.");
-        }
-
         List<GameNodeEntity> gameNodeEntity = getGameNodeEntity(block.getBlockContent());
-
         if (gameNodeEntity != null) {
-            HasGamesRelationshipEntity hasGamesRelationshipEntity = new HasGamesRelationshipEntity();
             GameNodeEntity endGame = gameNodeEntity.get(0);
             endGame = gameRepository.save(endGame);
 
-            hasGamesRelationshipEntity.setEndGame(endGame);
-            hasGamesRelationshipEntity.setStartBlock(newBlock);
+            HasGamesRelationshipEntity hasGamesRelationshipEntity = createHasGamesRelationshipEntity(newBlock, endGame);
             newBlock.setGame(hasGamesRelationshipEntity);
             hasGameRepository.save(hasGamesRelationshipEntity);
         }
 
-
-
+        FollowsRelationshipEntity follows = createFollowsRelationshipEntity(lastBlock, newBlock);
         newBlock.setFollows(follows);
-
-
         followsRepository.save(follows);
+
         BlockNodeEntity save = blockRepository.save(newBlock);
         System.out.println("Save: " + save);
+    }
+
+    private HasGamesRelationshipEntity createHasGamesRelationshipEntity(BlockNodeEntity newBlock, GameNodeEntity endGame) {
+        HasGamesRelationshipEntity hasGamesRelationshipEntity = new HasGamesRelationshipEntity();
+        hasGamesRelationshipEntity.setEndGame(endGame);
+        hasGamesRelationshipEntity.setStartBlock(newBlock);
+        return hasGamesRelationshipEntity;
+    }
+
+    private FollowsRelationshipEntity createFollowsRelationshipEntity(BlockNodeEntity lastBlock, BlockNodeEntity newBlock) throws BlockchainException {
+        FollowsRelationshipEntity follows = new FollowsRelationshipEntity();
+        follows.setCreated(Instant.now());
+        follows.setEndBlock(lastBlock);
+        follows.setStartBlock(newBlock);
+        try {
+            follows.setHash(lastBlock.toHash());
+        } catch (IOException |NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new BlockchainException("Unable to compute block hash.");
+        }
+        return follows;
     }
 
     private List<Game> getGamesRE(List<HasGamesRelationshipEntity> gameNodeEntities) {
@@ -191,6 +188,8 @@ public class DatabaseService {
         List<BlockNodeEntity> byBlockchain = blockRepository.findByBlockchain(name).stream()
                 .sorted((c1, c2) -> (int) (c1.getIndex() - c2.getIndex()))
                 .collect(Collectors.toList());
+
+
         if (byBlockchain.isEmpty()) return null;
 
         Blockchain blockchain = new Blockchain(name);
