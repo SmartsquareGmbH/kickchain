@@ -15,6 +15,7 @@ import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import java.time.Instant;
 
 @SpringBootApplication
+@EnableNeo4jRepositories(basePackages = "de.smartsquare.kickchain.neo4j.repository")
 //@SpringBootApplication(exclude={Neo4jDataAutoConfiguration.class})
 
 //@EnableNeo4jRepositories(basePackages = "de.smartsquare.kickchain.neo4j.repository")
