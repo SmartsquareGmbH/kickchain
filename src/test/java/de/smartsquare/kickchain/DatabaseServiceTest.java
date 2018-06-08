@@ -44,13 +44,13 @@ public class DatabaseServiceTest {
         Team t1 = new Team("Alpha", "Bravo");
         Team t2 = new Team("Charly", "Delta");
 
-        BlockContent game1 = new Game(t1, t2, new Score(10, 3));
-        List<BlockContent> games1 = Arrays.asList(game1);
+        Game game1 = new Game(t1, t2, new Score(10, 3));
+        List<Game> games1 = Arrays.asList(game1);
         Block block = new Block(2, Instant.now(), games1, 2, "preHash 1");
         databaseService.addBlock(TEST_CHAIN_NAME, block);
 
-        BlockContent game2 = new Game(t1, t2, new Score(10, 7));
-        List<BlockContent> games2 = Arrays.asList(game2);
+        Game game2 = new Game(t1, t2, new Score(10, 7));
+        List<Game> games2 = Arrays.asList(game2);
         block = new Block(3, Instant.now(), games2, 3, "preHash 2");
         databaseService.addBlock(TEST_CHAIN_NAME, block);
 

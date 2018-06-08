@@ -75,7 +75,7 @@ public class DatabaseService {
         return blockNodeEntity;
     }
 
-    private List<GameNodeEntity> getGameNodeEntity(List<BlockContent> blockContent) {
+    private List<GameNodeEntity> getGameNodeEntity(List<Game> blockContent) {
         if (blockContent == null) {
             return null;
         } else {
@@ -113,7 +113,7 @@ public class DatabaseService {
         BlockNodeEntity lastBlock = blockRepository.findEndByBlockchain(name);
         BlockNodeEntity newBlock = getBlockNodeEntity(name, block);
 
-        List<GameNodeEntity> gameNodeEntity = getGameNodeEntity(block.getBlockContent());
+        List<GameNodeEntity> gameNodeEntity = getGameNodeEntity(block.getContent());
         if (gameNodeEntity != null) {
             GameNodeEntity endGame = gameNodeEntity.get(0);
             endGame = gameRepository.save(endGame);
