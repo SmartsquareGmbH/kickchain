@@ -87,7 +87,7 @@ public class DatabaseService {
 
     private GameNodeEntity getGameNodeEntity(BlockContent blockContent) {
         if (blockContent instanceof Game) {
-            Game game =  (Game) blockContent;
+            Game game = (Game) blockContent;
 
             List<PlayerNodeEntity> team1 = game.getTeam1().getPlayers().stream()
                     .map(playerRepository::findByName)
@@ -145,7 +145,7 @@ public class DatabaseService {
         follows.setStartBlock(newBlock);
         try {
             follows.setHash(lastBlock.toHash());
-        } catch (IOException |NoSuchAlgorithmException e) {
+        } catch (IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
             throw new BlockchainException("Unable to compute block hash.");
         }
@@ -174,13 +174,13 @@ public class DatabaseService {
     private Game getGame(GameNodeEntity g) {
         System.out.println("g is " + g);
         return g == null || g.getTeam1() == null || g.getTeam2() == null ? null :
-        new Game(
-                new Team(g.getTeam1()),
-                new Team(g.getTeam2()),
+                new Game(
+                        new Team(g.getTeam1()),
+                        new Team(g.getTeam2()),
 //                new Team(g.getTeam1().stream().map(PlayerNodeEntity::getName).collect(Collectors.toList())),
 //                new Team(g.getTeam2().stream().map(PlayerNodeEntity::getName).collect(Collectors.toList())),
-                new Score(g.getScore1(), g.getScore2())
-        );
+                        new Score(g.getScore1(), g.getScore2())
+                );
     }
 
     public Blockchain loadBlockchain(String name) {
@@ -196,7 +196,7 @@ public class DatabaseService {
         for (BlockNodeEntity bne : byBlockchain) {
             String prevHash = bne.getFollows() != null ? bne.getFollows().getHash() : null;
             List<Game> games = bne.getGame() == null ? null : Arrays.asList(getGame(bne.getGame()));
-            Block block = new Block(bne.getIndex(), bne.getTimestamp(), games, bne.getProof(),  prevHash);
+            Block block = new Block(bne.getIndex(), bne.getTimestamp(), games, bne.getProof(), prevHash);
             blockchain.addBlock(block);
         }
 
