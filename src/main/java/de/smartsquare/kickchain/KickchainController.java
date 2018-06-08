@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class KickchainController {
@@ -101,6 +102,12 @@ public class KickchainController {
     public ResponseEntity<?> consensus() throws BlockchainException {
         Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
         Blockchain resolvedChain = consensusService.resolveConflicts(blockchain);
+        List<Block> nodesToAdd = resolvedChain.getChain().stream()
+                .filter(b -> b.getIndex() > blockchain.lastIndex())
+                .collect(Collectors.toList());
+        for (Block b : nodesToAdd) {
+            databaseService.addBlock(KICKCHAIN, b);
+        }
         return ResponseEntity.ok(resolvedChain);
     }
 
