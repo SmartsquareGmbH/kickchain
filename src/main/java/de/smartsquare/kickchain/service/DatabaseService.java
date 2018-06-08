@@ -112,6 +112,12 @@ public class DatabaseService {
     public void addBlock(String name, Block block) throws BlockchainException {
         BlockNodeEntity lastBlock = blockRepository.findEndByBlockchain(name);
         BlockNodeEntity newBlock = getBlockNodeEntity(name, block);
+        try {
+            newBlock.setPreviousHash(lastBlock.toHash());
+        } catch (IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new BlockchainException("Unable to compute block hash.");
+        }
 
         List<GameNodeEntity> gameNodeEntity = getGameNodeEntity(block.getContent());
         if (gameNodeEntity != null) {
@@ -143,12 +149,6 @@ public class DatabaseService {
         follows.setCreated(Instant.now());
         follows.setEndBlock(lastBlock);
         follows.setStartBlock(newBlock);
-        try {
-            follows.setHash(lastBlock.toHash());
-        } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new BlockchainException("Unable to compute block hash.");
-        }
         return follows;
     }
 
@@ -194,9 +194,8 @@ public class DatabaseService {
 
         Blockchain blockchain = new Blockchain(name);
         for (BlockNodeEntity bne : byBlockchain) {
-            String prevHash = bne.getFollows() != null ? bne.getFollows().getHash() : null;
             List<Game> games = bne.getGame() == null ? null : Arrays.asList(getGame(bne.getGame()));
-            Block block = new Block(bne.getIndex(), bne.getTimestamp(), games, bne.getProof(), prevHash);
+            Block block = new Block(bne.getIndex(), bne.getTimestamp(), games, bne.getProof(), bne.getPreviousHash());
             blockchain.addBlock(block);
         }
 

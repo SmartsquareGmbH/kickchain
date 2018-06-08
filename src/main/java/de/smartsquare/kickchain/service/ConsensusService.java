@@ -18,7 +18,9 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ConsensusService {
@@ -48,17 +50,29 @@ public class ConsensusService {
 
     private boolean validChain(Blockchain mine, Blockchain their) throws BlockchainException {
         try {
-            Block latestBlock = their.lastBlock();
 
-            for (Block current : their.getChain()) {
-                if (!mine.lastBlock().getPreviousHash().equals(latestBlock.toHash())) {
-                    return false;
-                }
-                if (!proof.apply(latestBlock.getProof(), current.getProof())) {
-                    return false;
-                }
-                latestBlock = current;
+            Block mineLast = mine.lastBlock();
+            Block theirMiddle = their.getByIndex(mineLast.getIndex());
+
+            if (!mineLast.toHash().equals(theirMiddle.toHash())) {
+                return false;
             }
+
+            Block latestBlock = theirMiddle;
+            List<Block> collect = their.getChain().stream()
+                    .filter(b -> b.getIndex() > mineLast.getIndex())
+                    .collect(Collectors.toList());
+
+            for (Block b : collect) {
+
+                if (!proof.apply(latestBlock.getProof(), b.getProof())) {
+                    return false;
+                }
+
+
+                latestBlock = b;
+            }
+
             return true;
         } catch (IOException | NoSuchAlgorithmException ex) {
             throw new BlockchainException("Unable to validate chain", ex);

@@ -20,7 +20,7 @@ public class KickchainService {
 
 
     public Block create(String name) {
-        Block block = new Block(1, Instant.now(), null, 100, "1");
+        Block block = new Block(1, null, null, 100, null);
         return block;
     }
 

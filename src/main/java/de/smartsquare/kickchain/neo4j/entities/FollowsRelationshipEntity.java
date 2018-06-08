@@ -20,8 +20,6 @@ FollowsRelationshipEntity {
 
     Instant created;
 
-    String hash;
-
     public Long getId() {
         return id;
     }
@@ -54,20 +52,11 @@ FollowsRelationshipEntity {
         this.created = created;
     }
 
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
-
     @Override
     public String toString() {
         return "FollowsRelationshipEntity{" +
                 "id=" + id +
                 ", created=" + created +
-                ", hash='" + hash + '\'' +
                 '}';
     }
 }

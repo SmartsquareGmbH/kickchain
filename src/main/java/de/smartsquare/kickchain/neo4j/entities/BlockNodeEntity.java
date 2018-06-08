@@ -28,6 +28,8 @@ public class BlockNodeEntity {
 
     private long proof;
 
+    private String previousHash;
+
     @Relationship(type = "HASGAME", direction = "INCOMING")
     HasGamesRelationshipEntity game;
 
@@ -75,6 +77,13 @@ public class BlockNodeEntity {
         this.proof = proof;
     }
 
+    public String getPreviousHash() {
+        return previousHash;
+    }
+
+    public void setPreviousHash(String previousHash) {
+        this.previousHash = previousHash;
+    }
 
     public FollowsRelationshipEntity getFollows() {
         return follows;
