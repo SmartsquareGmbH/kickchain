@@ -71,6 +71,7 @@ public class DatabaseService {
         blockNodeEntity.setTimestamp(block.getTimestamp());
         blockNodeEntity.setBlockchain(blockchain);
         blockNodeEntity.setIndex(block.getIndex());
+        blockNodeEntity.setPreviousHash(block.getPreviousHash());
 
         return blockNodeEntity;
     }
@@ -112,12 +113,6 @@ public class DatabaseService {
     public void addBlock(String name, Block block) throws BlockchainException {
         BlockNodeEntity lastBlock = blockRepository.findEndByBlockchain(name);
         BlockNodeEntity newBlock = getBlockNodeEntity(name, block);
-        try {
-            newBlock.setPreviousHash(lastBlock.toHash());
-        } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new BlockchainException("Unable to compute block hash.");
-        }
 
         List<GameNodeEntity> gameNodeEntity = getGameNodeEntity(block.getContent());
         if (gameNodeEntity != null) {
