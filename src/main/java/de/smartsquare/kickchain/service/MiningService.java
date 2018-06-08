@@ -16,11 +16,11 @@ public class MiningService {
         this.proof = zeroPaddedHashProof;
     }
 
-    public <T extends BlockContent> Block<T> mine(Block lastBlock, List<T> transactions) throws BlockchainException {
+    public Block mine(Block lastBlock, List<Game> transactions) throws BlockchainException {
         try {
             long proofOfWork = proofOfWork(lastBlock.getProof());
             String previousHash = lastBlock.toHash();
-            Block<T> block = new Block<>(
+            Block block = new Block(
                     lastBlock.getIndex() + 1,
                     Instant.now(),
                     transactions,

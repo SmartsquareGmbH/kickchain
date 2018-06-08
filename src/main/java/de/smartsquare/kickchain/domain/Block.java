@@ -9,20 +9,20 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.List;
 
-public class Block<T extends BlockContent> {
+public class Block {
 
     private long index;
     private Instant timestamp;
     private String previousHash;
 
-    private List<T> blockContent;
+    private List<Game> content;
 
     private long proof;
 
-    public Block(long index, Instant timestamp, List<T> blockContent, long proof, String previousHash) {
+    public Block(long index, Instant timestamp, List<Game> blockContent, long proof, String previousHash) {
         this.index = index;
         this.timestamp = timestamp;
-        this.blockContent = blockContent;
+        this.content = blockContent;
         this.proof = proof;
         this.previousHash = previousHash;
     }
@@ -38,8 +38,8 @@ public class Block<T extends BlockContent> {
         return timestamp;
     }
 
-    public List<T> getBlockContent() {
-        return blockContent;
+    public List<Game> getContent() {
+        return content;
     }
 
     public long getProof() {

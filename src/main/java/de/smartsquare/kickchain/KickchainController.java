@@ -104,7 +104,9 @@ public class KickchainController {
         Blockchain resolvedChain = consensusService.resolveConflicts(blockchain);
         List<Block> nodesToAdd = resolvedChain.getChain().stream()
                 .filter(b -> b.getIndex() > blockchain.lastIndex())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList(
+
+                ));
         for (Block b : nodesToAdd) {
             databaseService.addBlock(KICKCHAIN, b);
         }
