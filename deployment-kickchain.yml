@@ -22,3 +22,5 @@ spec:
         - -Djava.security.egd=file:/dev/./urandom
         - -jar
         - /kickchain.jar
+        - --spring.data.neo4j.uri=bolt://neo4j-core-0.neo4j.default.svc.cluster.local
+        - --spring.data.neo4j.username=neo4j
