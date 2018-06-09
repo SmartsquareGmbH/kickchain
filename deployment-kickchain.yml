@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: kickchain-app
-        image: gcr.io/kickchain-206706/kickchain:2
+        image: gcr.io/kickchain-206706/kickchain:3
         ports:
         - containerPort: 8080
         command: ["java"]
