@@ -1,63 +1,68 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="metro4:init" content="false">
     <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
 </head>
-
-<div id="app">
-
-    <div class="grid">
-        <div class="row">
-            <div class="cell-sm-full cell-md-one-half cell-lg-6">
-                <div class="form-group">
-                    <h2>Team 1</h2>
+<body>
+    <div id="app" class="p-5">
+        <h1>Kickchain</h1>
+        <div class="grid ">
+            <div class="row">
+                <div class="cell-sm-full cell-md-one-half cell-lg-6">
+                    <div class="form-group">
+                        <h2>Team 1</h2>
+                    </div>
+                    <div class="form-group">
+                        <label>Player 1</label>
+                        <input type="text" v-model="input.team1.players[0]" placeholder="Player 1"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Player 2</label>
+                        <input type="text" v-model="input.team1.players[1]" placeholder="Player 2"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Scores</label>
+                        <input type="number" min="0" max="10" v-model="input.score.goals1" placeholder="Punkte"/>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Player 1</label>
-                    <input type="text" v-model="input.team1.players[0]" placeholder="Player 1"/>
-                </div>
-                <div class="form-group">
-                    <label>Player 2</label>
-                    <input type="text" v-model="input.team1.players[1]" placeholder="Player 2"/>
-                </div>
-                <div class="form-group">
-                    <label>Scores</label>
-                    <input type="number" min="0" max="10" v-model="input.score.goals1" placeholder="Punkte"/>
+                <div class="cell-sm-full cell-md-one-half cell-lg-6">
+                    <div class="form-group">
+                        <h2>Team 2</h2>
+                    </div>
+                    <div class="form-group">
+                        <label>Player 1</label>
+                        <input type="text" v-model="input.team2.players[0]" placeholder="Player 1"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Player 2</label>
+                        <input type="text" v-model="input.team2.players[1]" placeholder="Player 2"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Scores</label>
+                        <input type="number" min="0" max="10" v-model="input.score.goals2" placeholder="Punkte"/>
+                    </div>
                 </div>
             </div>
-            <div class="cell-sm-full cell-md-one-half cell-lg-6">
-                <div class="form-group">
-                    <h2>Team 2</h2>
-                </div>
-                <div class="form-group">
-                    <label>Player 1</label>
-                    <input type="text" v-model="input.team2.players[0]" placeholder="Player 1"/>
-                </div>
-                <div class="form-group">
-                    <label>Player 2</label>
-                    <input type="text" v-model="input.team2.players[1]" placeholder="Player 2"/>
-                </div>
-                <div class="form-group">
-                    <label>Scores</label>
-                    <input type="number" min="0" max="10" v-model="input.score.goals2" placeholder="Punkte"/>
+            <div class="row">
+                <div class="cell-sm-full cell-md-full cell-lg-12" style="padding-top: 25px!important;">
+                    <button class="button success large" v-on:click="sendData()" style="width: 100%;">save</button>
                 </div>
             </div>
+
         </div>
-        <div class="row">
-            <div class="cell-sm-full cell-md-full cell-lg-12" style="padding-top: 25px!important;">
-                <button class="button success large" v-on:click="sendData()" style="width: 100%;">save</button>
-            </div>
-        </div>
 
+        <h2>Current Blockchain</h2>
+        <ul>
+            <li v-for="c in chain">{{ c.blockContent }}</li>
+        </ul>
     </div>
+</body>
 
-    <h2>Current Blockchain</h2>
-    <ul>
-        <li v-for="c in chain">{{ c.blockContent }}</li>
-    </ul>
-</div>
-
-
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
 <script src="https://unpkg.com/vue"></script>
 <script>
     var app = new Vue({
@@ -72,6 +77,9 @@
                     goals2: 0
                 }
             }
+        },
+        mounted: function () {
+            Metro.init();
         },
         created() {
             fetch('http://localhost:8080/chain')
