@@ -22,7 +22,7 @@ Install and setup a Neo4j server.
 
 ### Maven
 
-    $ mvn -Dneo4j.uri=bolt://neo4j:secret@localhost clean install
+    $ mvn clean install
 
 ### Docker
 

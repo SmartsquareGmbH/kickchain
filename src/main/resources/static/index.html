@@ -82,7 +82,7 @@
             Metro.init();
         },
         created() {
-            fetch('http://localhost:8080/chain')
+            fetch('chain')
                 .then(response => response.json())
                 .then(data => {
                     this.chain = data.chain.filter(function (block) {
@@ -92,7 +92,7 @@
         },
         methods: {
             sendData() {
-                fetch('http://localhost:8080/game/new', {
+                fetch('game/new', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
