@@ -51,11 +51,11 @@ public class KickchainController {
 
     @PostMapping(value = "/game/new")
     @ResponseBody
-    public Blockchain newGame(@RequestBody Game game) throws BlockchainException {
+    public ResponseEntity<?> newGame(@RequestBody Game game) throws BlockchainException {
         Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
         Block newBlock = kickchainService.newGame(blockchain.lastBlock(), game);
         databaseService.addBlock(blockchain.getName(), newBlock);
-        return databaseService.loadBlockchain(blockchain.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping(value = "/player/list")
