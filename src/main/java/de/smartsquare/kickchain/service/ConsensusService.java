@@ -50,10 +50,8 @@ public class ConsensusService {
 
     private boolean validChain(Blockchain mine, Blockchain their) throws BlockchainException {
         try {
-
             Block mineLast = mine.lastBlock();
             Block theirMiddle = their.getByIndex(mineLast.getIndex());
-
             if (!mineLast.toHash().equals(theirMiddle.toHash())) {
                 return false;
             }
@@ -64,12 +62,9 @@ public class ConsensusService {
                     .collect(Collectors.toList());
 
             for (Block b : collect) {
-
                 if (!proof.apply(latestBlock.getProof(), b.getProof())) {
                     return false;
                 }
-
-
                 latestBlock = b;
             }
 
@@ -85,18 +80,19 @@ public class ConsensusService {
 
     public Blockchain resolveConflicts(Blockchain mine) throws BlockchainException {
         Blockchain newChain = null;
-
         int maxLength = mine.getChain().size();
-
         for (String node : nodes) {
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<Blockchain> response = restTemplate.getForEntity("http://" + node + "/chain", Blockchain.class);
-
-            if (response.getStatusCode().equals(HttpStatus.OK)) {
-                if (response.getBody().getChain().size() > maxLength && validChain(mine, response.getBody())) {
-                    maxLength = response.getBody().getChain().size();
-                    newChain = response.getBody();
+            try {
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<Blockchain> response = restTemplate.getForEntity("http://" + node + "/chain", Blockchain.class);
+                if (response.getStatusCode().equals(HttpStatus.OK)) {
+                    if (response.getBody().getChain().size() > maxLength && validChain(mine, response.getBody())) {
+                        maxLength = response.getBody().getChain().size();
+                        newChain = response.getBody();
+                    }
                 }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
         if (newChain != null) {
