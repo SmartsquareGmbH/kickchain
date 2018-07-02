@@ -1,0 +1,19 @@
+version: '3'
+services: 
+  kickchain:  
+    image: docker.smartsquare.de/kickchain:1
+    command:
+      - java
+      - -Djava.security.egd=file:/dev/./urandom
+      - -jar
+      - /kickchain.jar
+      - --spring.data.neo4j.uri=bolt://neo4j
+    ports:
+     - "127.0.0.1:8080:8080"
+    depends_on:
+      - "neo4j"    
+
+  neo4j:
+    image: neo4j:3.4
+    environment:
+      NEO4J_AUTH: "none"
