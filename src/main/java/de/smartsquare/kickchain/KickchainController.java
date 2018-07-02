@@ -55,7 +55,7 @@ public class KickchainController {
         Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
         Block newBlock = kickchainService.newGame(blockchain.lastBlock(), game);
         databaseService.addBlock(blockchain.getName(), newBlock);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(fullChain());
     }
 
     @GetMapping(value = "/player/list")

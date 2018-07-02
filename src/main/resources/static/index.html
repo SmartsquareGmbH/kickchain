@@ -1,73 +1,143 @@
+<!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="metro4:init" content="false">
-    <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 <body>
-    <div id="app" class="p-5">
-        <h1>Kickchain</h1>
-        <div class="grid ">
-            <div class="row">
-                <div class="cell-sm-full cell-md-one-half cell-lg-6">
-                    <div class="form-group">
-                        <h2>Team 1</h2>
-                    </div>
-                    <div class="form-group">
-                        <label>Player 1</label>
-                        <input type="text" v-model="input.team1.players[0]" placeholder="Player 1"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Player 2</label>
-                        <input type="text" v-model="input.team1.players[1]" placeholder="Player 2"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Scores</label>
-                        <input type="number" min="0" max="10" v-model="input.score.goals1" placeholder="Punkte"/>
-                    </div>
-                </div>
-                <div class="cell-sm-full cell-md-one-half cell-lg-6">
-                    <div class="form-group">
-                        <h2>Team 2</h2>
-                    </div>
-                    <div class="form-group">
-                        <label>Player 1</label>
-                        <input type="text" v-model="input.team2.players[0]" placeholder="Player 1"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Player 2</label>
-                        <input type="text" v-model="input.team2.players[1]" placeholder="Player 2"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Scores</label>
-                        <input type="number" min="0" max="10" v-model="input.score.goals2" placeholder="Punkte"/>
-                    </div>
-                </div>
+<div id="app">
+    <v-app>
+        <template>
+            <div>
+                <v-toolbar flat color="white">
+                    <v-toolbar-title>blockchain for kicker games</v-toolbar-title>
+                    <v-divider
+                            class="mx-2"
+                            inset
+                            vertical
+                    ></v-divider>
+                    <v-spacer></v-spacer>
+                    <v-dialog v-model="dialog" max-width="500px">
+                        <v-btn slot="activator" color="primary" dark class="mb-2">
+                            <v-icon dark>add</v-icon>
+                        </v-btn>
+
+                        <v-card>
+                            <v-form ref="form" v-model="valid" lazy-validation>
+                                <v-card-title class="headline primary"
+                                              primary-title>
+                                    <span class="headline">new game</span>
+                                </v-card-title>
+
+                                <v-card-text>
+                                    <v-list three-line subheader>
+                                        <v-subheader>Team 1</v-subheader>
+                                        <v-container grid-list-md>
+                                            <v-layout wrap>
+                                                <v-flex xs12 sm6 md4>
+                                                    <v-text-field v-model="input.team1.players[0]"
+                                                                  label="player 1"
+                                                                  placeholder="Placeholder"
+                                                                  :rules="nameRules"
+                                                                  required></v-text-field>
+                                                </v-flex>
+                                                <v-flex xs12 sm6 md4>
+                                                    <v-text-field v-model="input.team1.players[1]"
+                                                                  label="player 2"
+                                                                  placeholder="Placeholder"></v-text-field>
+                                                </v-flex>
+                                                <v-flex xs12 sm6 md4>
+                                                    <v-text-field v-model="input.score.goals1" label="goals"
+                                                                  mask="##" :rules="goalsRules"></v-text-field>
+                                                </v-flex>
+                                            </v-layout>
+                                        </v-container>
+                                        <v-subheader>Team 2</v-subheader>
+                                        <v-container grid-list-md>
+                                            <v-layout wrap>
+                                                <v-flex xs12 sm6 md4>
+                                                    <v-text-field v-model="input.team2.players[0]"
+                                                                  label="player 1"
+                                                                  placeholder="Placeholder"
+                                                                  :rules="nameRules"
+                                                                  required></v-text-field>
+                                                </v-flex>
+                                                <v-flex xs12 sm6 md4>
+                                                    <v-text-field v-model="input.team2.players[1]"
+                                                                  label="player 2"
+                                                                  placeholder="Placeholder"></v-text-field>
+                                                </v-flex>
+                                                <v-flex xs12 sm6 md4>
+                                                    <v-text-field v-model="input.score.goals2"
+                                                                  label="goals" mask="##"
+                                                                  :rules="goalsRules"></v-text-field>
+                                                </v-flex>
+                                            </v-layout>
+                                        </v-container>
+                                    </v-list>
+                                </v-card-text>
+
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
+                                    <v-btn color="blue darken-1" flat @click.native="save" :disabled="!valid">Save
+                                    </v-btn>
+                                </v-card-actions>
+                            </v-form>
+                        </v-card>
+                    </v-dialog>
+                </v-toolbar>
+                <v-data-table
+                        :headers="headers"
+                        :items="chain"
+                        hide-actions
+                        class="elevation-1"
+                >
+                    <template slot="items" slot-scope="props">
+                        <td class="text-xs-left">{{ props.item.index }}</td>
+                        <td class="text-xs-left">{{ props.item.content[0].team1.players[0] }}<span
+                                v-if="props.item.content[0].team1.players.length==2"> & {{ props.item.content[0].team1.players[1] }}</span>
+                        </td>
+                        <td class="text-xs-left">
+                            {{ props.item.content[0].team2.players[0] }}<span
+                                v-if="props.item.content[0].team2.players.length==2"> & {{ props.item.content[0].team2.players[1] }}
+                        </td>
+                        <td class="text-xs-right">{{ props.item.content[0].score.goals1 }}:{{
+                            props.item.content[0].score.goals2 }}
+                        </td>
+                    </template>
+                    <template slot="no-data">
+                        <v-btn color="primary" @click="initialize">Reset</v-btn>
+                    </template>
+                </v-data-table>
             </div>
-            <div class="row">
-                <div class="cell-sm-full cell-md-full cell-lg-12" style="padding-top: 25px!important;">
-                    <button class="button success large" v-on:click="sendData()" style="width: 100%;">save</button>
-                </div>
-            </div>
+        </template>
+    </v-app>
+</div>
 
-        </div>
-
-        <h2>Current Blockchain</h2>
-        <ul>
-            <li v-for="c in chain">{{ c.blockContent }}</li>
-        </ul>
-    </div>
-</body>
-
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
-<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
 <script>
     var app = new Vue({
         el: '#app',
         data: {
+            valid: true,
+            dialog: false,
+            goalsRules: [
+                v => !!v || 'goals for team are required',
+                v => (v && v >= 0 && v <= 10) || 'Goals must be between 0 - 10'
+            ],
+            nameRules: [
+                v => !!v || 'Name is required',
+                v => (v && v.length <= 10) || 'Name must be less than 10 characters'
+            ],
+            headers: [
+                {text: '#', value: 'idx', sortable: false},
+                {text: 'Team 1', value: 'team1'},
+                {text: 'Team 2', value: 'team2'},
+                {text: 'Result', value: 'result', align: 'right'},
+            ],
             chain: [],
             input: {
                 team1: {players: []},
@@ -78,34 +148,54 @@
                 }
             }
         },
-        mounted: function () {
-            Metro.init();
+        watch: {
+            dialog(val) {
+                val || this.close()
+            }
         },
         created() {
-            fetch('chain')
-                .then(response => response.json())
-                .then(data => {
-                    this.chain = data.chain.filter(function (block) {
-                        return block.blockContent != null
-                    })
-                })
+            this.initialize()
         },
         methods: {
-            sendData() {
-                fetch('game/new', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(this.input),
-                }).then((res) => res.json())
-                    .then((data) => this.chain = data.chain)
-                    .catch((err) => console.log(err))
-            }
+            initialize() {
+                fetch('chain')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.chain = data.chain.filter(function (block) {
+                            return block.content != null
+                        })
+                    })
+            },
+            resetInput() {
+                this.input.team1.players = [];
+                this.input.team2.players = [];
+                this.input.score.goals1 = '0';
+                this.input.score.goals2 = '0';
+            },
+            save() {
+                if (this.$refs.form.validate()) {
+                    fetch('game/new', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(this.input),
+                    }).then((res) => res.json())
+                        .then((data) => this.chain = data.chain.filter(function (block) {
+                            return block.content != null
+                        }))
+                        .then(this.resetInput())
+                        .then(this.close())
+                        .catch((err) => console.log(err))
+                }
+            },
+            close() {
+                this.dialog = false
+            },
+
         }
     })
 </script>
-
-
+</body>
 </html>
