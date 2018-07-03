@@ -169,8 +169,8 @@
             resetInput() {
                 this.input.team1.players = [];
                 this.input.team2.players = [];
-                this.input.score.goals1 = '0';
-                this.input.score.goals2 = '0';
+                this.input.score.goals1 = 0;
+                this.input.score.goals2 = 0;
             },
             save() {
                 if (this.$refs.form.validate()) {
@@ -185,13 +185,13 @@
                         .then((data) => this.chain = data.chain.filter(function (block) {
                             return block.content != null
                         }))
-                        .then(this.resetInput())
                         .then(this.close())
                         .catch((err) => console.log(err))
                 }
             },
             close() {
-                this.dialog = false
+                this.resetInput();
+                this.dialog = false;
             },
 
         }

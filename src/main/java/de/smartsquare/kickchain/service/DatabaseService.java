@@ -8,8 +8,6 @@ import de.smartsquare.kickchain.neo4j.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,6 +111,7 @@ public class DatabaseService {
     public void addBlock(String name, Block block) throws BlockchainException {
         BlockNodeEntity lastBlock = blockRepository.findEndByBlockchain(name);
         BlockNodeEntity newBlock = getBlockNodeEntity(name, block);
+        newBlock.setIndex(lastBlock.getIndex() + 1);
 
         List<GameNodeEntity> gameNodeEntity = getGameNodeEntity(block.getContent());
         if (gameNodeEntity != null) {
@@ -181,7 +180,7 @@ public class DatabaseService {
     public Blockchain loadBlockchain(String name) {
 
         List<BlockNodeEntity> byBlockchain = blockRepository.findByBlockchain(name).stream()
-                .sorted((c1, c2) -> (int) (c1.getIndex() - c2.getIndex()))
+                .sorted((c1, c2) -> (int) (c2.getIndex() - c1.getIndex()))
                 .collect(Collectors.toList());
 
 
