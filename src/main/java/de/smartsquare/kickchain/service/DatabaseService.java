@@ -178,11 +178,12 @@ public class DatabaseService {
     }
 
     public Blockchain loadBlockchain(String name) {
-
-        List<BlockNodeEntity> byBlockchain = blockRepository.findByBlockchain(name).stream()
-                .sorted((c1, c2) -> (int) (c2.getIndex() - c1.getIndex()))
-                .collect(Collectors.toList());
-
+        List<BlockNodeEntity> byBlockchain = blockRepository.findByBlockchain(name);
+        if (byBlockchain.size() > 1) {
+            byBlockchain = byBlockchain.stream()
+                    .sorted((c1, c2) -> (int) (c2.getIndex() - c1.getIndex()))
+                    .collect(Collectors.toList());
+        }
 
         if (byBlockchain.isEmpty()) return null;
 
