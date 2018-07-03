@@ -2,11 +2,9 @@ package de.smartsquare.kickchain.service;
 
 import de.smartsquare.kickchain.BlockchainException;
 import de.smartsquare.kickchain.domain.Block;
-import de.smartsquare.kickchain.domain.Blockchain;
 import de.smartsquare.kickchain.domain.Game;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Collections;
 
 @Service
@@ -20,7 +18,7 @@ public class KickchainService {
 
 
     public Block create(String name) {
-        Block block = new Block(1, null, null, 100, null);
+        Block block = new Block(0, null, null, 100, null);
         return block;
     }
 

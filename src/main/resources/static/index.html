@@ -27,14 +27,14 @@
                             <v-form ref="form" v-model="valid" lazy-validation>
                                 <v-card-title class="headline primary"
                                               primary-title>
-                                    <span class="headline">new game</span>
+                                    <span class="headline white--text">new game</span>
                                 </v-card-title>
 
                                 <v-card-text>
                                     <v-list three-line subheader>
                                         <v-subheader>Team 1</v-subheader>
                                         <v-container grid-list-md>
-                                            <v-layout wrap>
+                                            <v-layout Fnowrap>
                                                 <v-flex xs12 sm6 md4>
                                                     <v-text-field v-model="input.team1.players[0]"
                                                                   label="player 1"
@@ -55,7 +55,7 @@
                                         </v-container>
                                         <v-subheader>Team 2</v-subheader>
                                         <v-container grid-list-md>
-                                            <v-layout wrap>
+                                            <v-layout nowrap>
                                                 <v-flex xs12 sm6 md4>
                                                     <v-text-field v-model="input.team2.players[0]"
                                                                   label="player 1"
