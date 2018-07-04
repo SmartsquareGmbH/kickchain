@@ -7,6 +7,4 @@ public interface PlayerRepository extends CrudRepository<PlayerNodeEntity, Strin
 
     PlayerNodeEntity findByName(String name);
 
-    String deleteByName(String name);
-
 }

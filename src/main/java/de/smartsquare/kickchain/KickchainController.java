@@ -79,7 +79,7 @@ public class KickchainController {
     @GetMapping(value = "/chain/new/{name}")
     @ResponseBody
     public Blockchain newChain(@PathVariable("name") String name) {
-        Block genesisBlock = kickchainService.create(name);
+        Block genesisBlock = kickchainService.create();
         databaseService.createBlockchain(name, genesisBlock);
         return databaseService.loadBlockchain(name);
     }
@@ -99,14 +99,12 @@ public class KickchainController {
 
     @GetMapping(value = "/nodes/resolve")
     @ResponseBody
-    public ResponseEntity<?> consensus() throws BlockchainException {
+    public ResponseEntity<?> consensus() {
         Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
         Blockchain resolvedChain = consensusService.resolveConflicts(blockchain);
         List<Block> nodesToAdd = resolvedChain.getChain().stream()
                 .filter(b -> b.getIndex() > blockchain.lastIndex())
-                .collect(Collectors.toList(
-
-                ));
+                .collect(Collectors.toList());
         for (Block b : nodesToAdd) {
             databaseService.addBlock(KICKCHAIN, b);
         }
@@ -115,7 +113,7 @@ public class KickchainController {
 
     @GetMapping(value = "/nodes/list")
     @ResponseBody
-    public ResponseEntity<?> listNodes() throws BlockchainException {
+    public ResponseEntity<?> listNodes() {
         Set<String> nodes = consensusService.getNodes();
         return ResponseEntity.ok(nodes);
     }

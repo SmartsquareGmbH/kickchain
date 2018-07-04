@@ -31,11 +31,11 @@ public class BlockNodeEntity {
     private String previousHash;
 
     @Relationship(type = "HASGAME", direction = "INCOMING")
-    HasGamesRelationshipEntity game;
+    private HasGamesRelationshipEntity game;
 
     @JsonIgnore
     @Relationship(type = "FOLLOWS")
-    FollowsRelationshipEntity follows;
+    private FollowsRelationshipEntity follows;
 
     public Long getId() {
         return id;

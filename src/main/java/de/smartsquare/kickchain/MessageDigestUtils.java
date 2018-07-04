@@ -11,7 +11,7 @@ public class MessageDigestUtils {
         return sha256(msg, StandardCharsets.UTF_8);
     }
 
-    public static String sha256(String msg, Charset charset) throws NoSuchAlgorithmException {
+    private static String sha256(String msg, Charset charset) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] encodedhash = digest.digest(msg.getBytes(charset));
         return bytesToHex(encodedhash);

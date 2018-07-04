@@ -17,14 +17,12 @@ public class KickchainService {
     }
 
 
-    public Block create(String name) {
-        Block block = new Block(0, null, null, 100, null);
-        return block;
+    public Block create() {
+        return new Block(0, null, null, 100, null);
     }
 
     public Block newGame(Block lastBlock, Game game) throws BlockchainException {
-        Block minedBlock = miningService.mine(lastBlock, Collections.singletonList(game));
-        return minedBlock;
+        return miningService.mine(lastBlock, Collections.singletonList(game));
     }
 
 }

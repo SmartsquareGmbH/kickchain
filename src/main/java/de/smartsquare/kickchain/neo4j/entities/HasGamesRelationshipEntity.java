@@ -12,10 +12,10 @@ public class HasGamesRelationshipEntity {
 
     @JsonIgnore
     @EndNode
-    BlockNodeEntity startBlock;
+    private BlockNodeEntity startBlock;
 
     @StartNode
-    GameNodeEntity endGame;
+    private GameNodeEntity endGame;
 
     public Long getId() {
         return id;

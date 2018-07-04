@@ -12,10 +12,10 @@ public class InTeamRelationshipEntity {
 
     @JsonIgnore
     @StartNode
-    GameNodeEntity gameNode;
+    private GameNodeEntity gameNode;
 
     @EndNode
-    PlayerNodeEntity playerNode;
+    private PlayerNodeEntity playerNode;
 
     public Long getId() {
         return id;

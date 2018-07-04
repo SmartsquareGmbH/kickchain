@@ -1,7 +1,5 @@
 package de.smartsquare.kickchain.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.smartsquare.kickchain.BlockchainException;
 import de.smartsquare.kickchain.domain.*;
 import de.smartsquare.kickchain.neo4j.entities.*;
 import de.smartsquare.kickchain.neo4j.repository.*;
@@ -10,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,21 +21,17 @@ public class DatabaseService {
     private final HasGameRepository hasGameRepository;
     private final GameRepository gameRepository;
 
-    private final ObjectMapper mapper;
-
     @Autowired
     public DatabaseService(BlockRepository blockRepository,
                            FollowsRepository followsRepository,
                            PlayerRepository playerRepository,
                            GameRepository gameRepository,
-                           HasGameRepository hasGameRepository,
-                           ObjectMapper mapper) {
+                           HasGameRepository hasGameRepository) {
         this.blockRepository = blockRepository;
         this.followsRepository = followsRepository;
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
         this.hasGameRepository = hasGameRepository;
-        this.mapper = mapper;
     }
 
     public void createPlayer(String name, String publicKey) {
@@ -108,7 +102,7 @@ public class DatabaseService {
         throw new RuntimeException("Only BlockContent of type Game allowed yet.");
     }
 
-    public void addBlock(String name, Block block) throws BlockchainException {
+    public void addBlock(String name, Block block) {
         BlockNodeEntity lastBlock = blockRepository.findEndByBlockchain(name);
         BlockNodeEntity newBlock = getBlockNodeEntity(name, block);
         newBlock.setIndex(lastBlock.getIndex() + 1);
@@ -138,7 +132,7 @@ public class DatabaseService {
         return hasGamesRelationshipEntity;
     }
 
-    private FollowsRelationshipEntity createFollowsRelationshipEntity(BlockNodeEntity lastBlock, BlockNodeEntity newBlock) throws BlockchainException {
+    private FollowsRelationshipEntity createFollowsRelationshipEntity(BlockNodeEntity lastBlock, BlockNodeEntity newBlock) {
         FollowsRelationshipEntity follows = new FollowsRelationshipEntity();
         follows.setCreated(Instant.now());
         follows.setEndBlock(lastBlock);
@@ -148,7 +142,7 @@ public class DatabaseService {
 
     private List<Game> getGamesRE(List<HasGamesRelationshipEntity> gameNodeEntities) {
         return gameNodeEntities == null ? null : gameNodeEntities.stream()
-                .map(g -> g.getEndGame())
+                .map(HasGamesRelationshipEntity::getEndGame)
                 .map(this::getGame)
                 .collect(Collectors.toList());
     }
@@ -189,7 +183,7 @@ public class DatabaseService {
 
         Blockchain blockchain = new Blockchain(name);
         for (BlockNodeEntity bne : byBlockchain) {
-            List<Game> games = bne.getGame() == null ? null : Arrays.asList(getGame(bne.getGame()));
+            List<Game> games = bne.getGame() == null ? null : Collections.singletonList(getGame(bne.getGame()));
             Block block = new Block(bne.getIndex(), bne.getTimestamp(), games, bne.getProof(), bne.getPreviousHash());
             blockchain.addBlock(block);
         }

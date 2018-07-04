@@ -30,7 +30,7 @@ public class ConsensusService {
 
     private final Proof<Boolean> proof;
 
-    private Set<String> nodes = new HashSet<>();
+    private final Set<String> nodes = new HashSet<>();
 
     @PostConstruct
     public void postConstruct() {
@@ -78,7 +78,7 @@ public class ConsensusService {
         return nodes;
     }
 
-    public Blockchain resolveConflicts(Blockchain mine) throws BlockchainException {
+    public Blockchain resolveConflicts(Blockchain mine) {
         Blockchain newChain = null;
         int maxLength = mine.getChain().size();
         for (String node : nodes) {

@@ -102,13 +102,10 @@
                         <td class="text-xs-left">
                             {{ props.item.content[0].team2.players[0] }}<span
                                 v-if="props.item.content[0].team2.players.length==2"> & {{ props.item.content[0].team2.players[1] }}
-                        </td>
+                        </span></td>
                         <td class="text-xs-right">{{ props.item.content[0].score.goals1 }}:{{
                             props.item.content[0].score.goals2 }}
                         </td>
-                    </template>
-                    <template slot="no-data">
-                        <v-btn color="primary" @click="initialize">Reset</v-btn>
                     </template>
                 </v-data-table>
             </div>

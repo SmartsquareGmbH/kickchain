@@ -1,7 +1,10 @@
 package de.smartsquare.kickchain.service;
 
 import de.smartsquare.kickchain.BlockchainException;
-import de.smartsquare.kickchain.domain.*;
+import de.smartsquare.kickchain.domain.Block;
+import de.smartsquare.kickchain.domain.Game;
+import de.smartsquare.kickchain.domain.Proof;
+import de.smartsquare.kickchain.domain.ZeroPaddedHashProof;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -16,17 +19,16 @@ public class MiningService {
         this.proof = zeroPaddedHashProof;
     }
 
-    public Block mine(Block lastBlock, List<Game> transactions) throws BlockchainException {
+    Block mine(Block lastBlock, List<Game> transactions) throws BlockchainException {
         try {
             long proofOfWork = proofOfWork(lastBlock.getProof());
             String previousHash = lastBlock.toHash();
-            Block block = new Block(
+            return new Block(
                     lastBlock.getIndex() + 1,
                     Instant.now(),
                     transactions,
                     proofOfWork,
                     previousHash);
-            return block;
         } catch (Exception e) {
             throw new BlockchainException("Unable to get proof of work", e);
         }

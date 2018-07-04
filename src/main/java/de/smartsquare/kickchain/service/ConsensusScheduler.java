@@ -1,6 +1,5 @@
 package de.smartsquare.kickchain.service;
 
-import de.smartsquare.kickchain.BlockchainException;
 import de.smartsquare.kickchain.domain.Block;
 import de.smartsquare.kickchain.domain.Blockchain;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,10 +25,8 @@ public class ConsensusScheduler {
 
     @Scheduled(fixedRate = 300000L)
     public void resolveKickchainConflicts() {
-        try {
             Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
-            Blockchain resolvedChain = null;
-            resolvedChain = consensusService.resolveConflicts(blockchain);
+        Blockchain resolvedChain = consensusService.resolveConflicts(blockchain);
             List<Block> nodesToAdd = resolvedChain.getChain().stream()
                     .filter(b -> b.getIndex() > blockchain.lastIndex())
                     .collect(Collectors.toList(
@@ -38,10 +35,6 @@ public class ConsensusScheduler {
             for (Block b : nodesToAdd) {
                 databaseService.addBlock(KICKCHAIN, b);
             }
-        } catch (BlockchainException e) {
-            e.printStackTrace();
-        }
-
     }
 
 }

@@ -13,12 +13,12 @@ FollowsRelationshipEntity {
     private Long id;
 
     @StartNode
-    BlockNodeEntity startBlock;
+    private BlockNodeEntity startBlock;
 
     @EndNode
-    BlockNodeEntity endBlock;
+    private BlockNodeEntity endBlock;
 
-    Instant created;
+    private Instant created;
 
     public Long getId() {
         return id;

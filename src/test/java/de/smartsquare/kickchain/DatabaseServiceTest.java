@@ -6,14 +6,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -29,7 +28,7 @@ public class DatabaseServiceTest {
     private DatabaseService databaseService;
 
     @Test
-    public void testResolve() throws Exception {
+    public void testResolve() {
 
         databaseService.createPlayer("Alpha", "Alpha-pubKey");
         databaseService.createPlayer("Bravo", "Bravo-pubKey");
@@ -37,7 +36,7 @@ public class DatabaseServiceTest {
         databaseService.createPlayer("Delta", "Delta-pubKey");
 
         Blockchain blockchain = new Blockchain(TEST_CHAIN_NAME);
-        Block genesis = new Block(1, Instant.now(), new ArrayList(), 1, null);
+        Block genesis = new Block(1, Instant.now(), new ArrayList<>(), 1, null);
 
         databaseService.createBlockchain(TEST_CHAIN_NAME, genesis);
 
@@ -45,12 +44,12 @@ public class DatabaseServiceTest {
         Team t2 = new Team("Charly", "Delta");
 
         Game game1 = new Game(t1, t2, new Score(10, 3));
-        List<Game> games1 = Arrays.asList(game1);
+        List<Game> games1 = Collections.singletonList(game1);
         Block block = new Block(2, Instant.now(), games1, 2, "preHash 1");
         databaseService.addBlock(TEST_CHAIN_NAME, block);
 
         Game game2 = new Game(t1, t2, new Score(10, 7));
-        List<Game> games2 = Arrays.asList(game2);
+        List<Game> games2 = Collections.singletonList(game2);
         block = new Block(3, Instant.now(), games2, 3, "preHash 2");
         databaseService.addBlock(TEST_CHAIN_NAME, block);
 

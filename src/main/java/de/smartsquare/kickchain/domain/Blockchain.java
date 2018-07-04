@@ -33,9 +33,8 @@ public class Blockchain {
         this.chain = chain;
     }
 
-    public int addBlock(Block block) {
+    public void addBlock(Block block) {
         getChain().add(block);
-        return getChain().size();
     }
 
     public Block lastBlock() throws NoSuchElementException {
