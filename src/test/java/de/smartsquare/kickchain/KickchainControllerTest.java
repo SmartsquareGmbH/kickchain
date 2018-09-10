@@ -6,7 +6,6 @@ import de.smartsquare.kickchain.domain.Game;
 import de.smartsquare.kickchain.domain.Score;
 import de.smartsquare.kickchain.domain.Team;
 import de.smartsquare.kickchain.service.ConsensusService;
-import de.smartsquare.kickchain.service.DatabaseService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,10 +43,6 @@ public class KickchainControllerTest {
 
     @MockBean
     private ConsensusService consensusService;
-
-
-    @MockBean
-    private DatabaseService databaseService;
 
 
     @Test
