@@ -27,20 +27,20 @@ public class KickchainController {
 
     private final ConsensusService consensusService;
 
-    private final DatabaseService databaseService;
+    private final DatabaseService jpaService;
 
     @Autowired
-    public KickchainController(KickchainService kickchainService, ConsensusService consensusService, DatabaseService databaseService) {
+    public KickchainController(KickchainService kickchainService, ConsensusService consensusService, DatabaseService jpaService) {
         this.kickchainService = kickchainService;
         this.consensusService = consensusService;
-        this.databaseService = databaseService;
+        this.jpaService = jpaService;
     }
 
     @PostConstruct
     public void init() {
         Blockchain blockchain = null;
         try {
-            blockchain = databaseService.loadBlockchain(KICKCHAIN);
+            blockchain = jpaService.loadBlockchain(KICKCHAIN);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,36 +52,36 @@ public class KickchainController {
     @PostMapping(value = "/game/new")
     @ResponseBody
     public ResponseEntity<?> newGame(@RequestBody Game game) throws BlockchainException {
-        Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
+        Blockchain blockchain = jpaService.loadBlockchain(KICKCHAIN);
         Block newBlock = kickchainService.newGame(blockchain.lastBlock(), game);
-        databaseService.addBlock(blockchain.getName(), newBlock);
+        jpaService.addBlock(blockchain.getName(), newBlock);
         return ResponseEntity.status(HttpStatus.CREATED).body(fullChain());
     }
 
     @GetMapping(value = "/player/list")
     @ResponseBody
     public List<String> playerNames() {
-        return databaseService.playerNames();
+        return jpaService.playerNames();
     }
 
     @GetMapping(value = "/player/{name}/pubkey")
     @ResponseBody
     public String playerPublicKey(@PathVariable("name") String name) {
-        return databaseService.getPublicKeyByPlayerName(name);
+        return jpaService.getPublicKeyByPlayerName(name);
     }
 
     @GetMapping(value = "/chain")
     @ResponseBody
     public Blockchain fullChain() {
-        return databaseService.loadBlockchain(KICKCHAIN);
+        return jpaService.loadBlockchain(KICKCHAIN);
     }
 
     @GetMapping(value = "/chain/new/{name}")
     @ResponseBody
     public Blockchain newChain(@PathVariable("name") String name) {
         Block genesisBlock = kickchainService.create();
-        databaseService.createBlockchain(name, genesisBlock);
-        return databaseService.loadBlockchain(name);
+        jpaService.createBlockchain(name, genesisBlock);
+        return jpaService.loadBlockchain(name);
     }
 
 
@@ -100,13 +100,13 @@ public class KickchainController {
     @GetMapping(value = "/nodes/resolve")
     @ResponseBody
     public ResponseEntity<?> consensus() {
-        Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
+        Blockchain blockchain = jpaService.loadBlockchain(KICKCHAIN);
         Blockchain resolvedChain = consensusService.resolveConflicts(blockchain);
         List<Block> nodesToAdd = resolvedChain.getChain().stream()
                 .filter(b -> b.getIndex() > blockchain.lastIndex())
                 .collect(Collectors.toList());
         for (Block b : nodesToAdd) {
-            databaseService.addBlock(KICKCHAIN, b);
+            jpaService.addBlock(KICKCHAIN, b);
         }
         return ResponseEntity.ok(resolvedChain);
     }

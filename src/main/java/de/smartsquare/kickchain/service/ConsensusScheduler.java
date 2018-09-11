@@ -13,19 +13,19 @@ import static de.smartsquare.kickchain.KickchainController.KICKCHAIN;
 @Service
 public class ConsensusScheduler {
 
-    private final DatabaseService databaseService;
+    private final DatabaseService jpaService;
 
     private final ConsensusService consensusService;
 
 
-    public ConsensusScheduler(DatabaseService databaseService, ConsensusService consensusService) {
-        this.databaseService = databaseService;
+    public ConsensusScheduler(DatabaseService jpaService, ConsensusService consensusService) {
+        this.jpaService = jpaService;
         this.consensusService = consensusService;
     }
 
     @Scheduled(fixedRate = 300000L)
     public void resolveKickchainConflicts() {
-            Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
+            Blockchain blockchain = jpaService.loadBlockchain(KICKCHAIN);
         Blockchain resolvedChain = consensusService.resolveConflicts(blockchain);
             List<Block> nodesToAdd = resolvedChain.getChain().stream()
                     .filter(b -> b.getIndex() > blockchain.lastIndex())
@@ -33,7 +33,7 @@ public class ConsensusScheduler {
 
                     ));
             for (Block b : nodesToAdd) {
-                databaseService.addBlock(KICKCHAIN, b);
+                jpaService.addBlock(KICKCHAIN, b);
             }
     }
 
