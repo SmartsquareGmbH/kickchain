@@ -73,7 +73,8 @@ public class KickchainController {
     @GetMapping(value = "/chain")
     @ResponseBody
     public Blockchain fullChain() {
-        return jpaService.loadBlockchain(KICKCHAIN);
+        Blockchain blockchain = jpaService.loadBlockchain(KICKCHAIN);
+        return blockchain;
     }
 
     @GetMapping(value = "/chain/new/{name}")

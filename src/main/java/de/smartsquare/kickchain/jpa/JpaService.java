@@ -94,7 +94,7 @@ public class JpaService implements DatabaseService {
     }
 
     private Comparator<BlockEntity> compareByIndex() {
-        return (b1, b2) -> (int) (b2.getIndex() - b1.getIndex());
+        return (b1, b2) -> (int) (b1.getIndex() - b2.getIndex());
     }
 
     @Override
