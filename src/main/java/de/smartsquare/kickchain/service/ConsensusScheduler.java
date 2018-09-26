@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static de.smartsquare.kickchain.KickchainController.KICKCHAIN;
+import static de.smartsquare.kickchain.KickchainApiController.KICKCHAIN;
 
 @Service
 public class ConsensusScheduler {

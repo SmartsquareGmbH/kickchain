@@ -10,6 +10,7 @@ import de.smartsquare.kickchain.jpa.repository.JpaPlayerRepository;
 import de.smartsquare.kickchain.service.DatabaseService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,18 +84,17 @@ public class JpaService implements DatabaseService {
             }).collect(Collectors.toList());
     }
 
+    private Comparator<BlockEntity> compareByIndex() {
+        return (b1, b2) -> (int) (b1.getIndex() - b2.getIndex());
+    }
+
     @Override
     public void addBlock(String name, Block block) {
         BlockEntity lastBlock = blockRepository.findAllByBlockchain(name).stream()
                 .max(compareByIndex())
                 .orElseThrow(() -> new IllegalStateException("Blockchain must have at least the genesis block."));
-
         BlockEntity blockEntity = getBlockEntity(name, block, lastBlock);
         blockRepository.save(blockEntity);
-    }
-
-    private Comparator<BlockEntity> compareByIndex() {
-        return (b1, b2) -> (int) (b1.getIndex() - b2.getIndex());
     }
 
     @Override
@@ -113,6 +113,9 @@ public class JpaService implements DatabaseService {
     }
 
     private List<Game> getGames(BlockEntity be) {
+        if (be.getGames() == null) {
+            return Collections.EMPTY_LIST;
+        }
         return be.getGames().stream().map(ge -> {
             Team team1 = new Team(ge.getTeam1());
             Team team2 = new Team(ge.getTeam2());
