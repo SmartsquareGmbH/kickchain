@@ -1,7 +1,7 @@
-package de.smartsquare.kickchain;
+package de.smartsquare.kickchain.neo4j;
 
 import de.smartsquare.kickchain.domain.*;
-import de.smartsquare.kickchain.service.DatabaseService;
+import de.smartsquare.kickchain.neo4j.Neo4jService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,27 +18,27 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
-public class DatabaseServiceTest {
+public class Neo4jServiceTest {
 
     private static final String TEST_CHAIN_NAME = "__Test__";
 
 
 
     @Autowired
-    private DatabaseService databaseService;
+    private Neo4jService neo4jService;
 
     @Test
     public void testResolve() {
 
-        databaseService.createPlayer("Alpha", "Alpha-pubKey");
-        databaseService.createPlayer("Bravo", "Bravo-pubKey");
-        databaseService.createPlayer("Charly", "Charly-pubKey");
-        databaseService.createPlayer("Delta", "Delta-pubKey");
+        neo4jService.createPlayer("Alpha", "Alpha-pubKey");
+        neo4jService.createPlayer("Bravo", "Bravo-pubKey");
+        neo4jService.createPlayer("Charly", "Charly-pubKey");
+        neo4jService.createPlayer("Delta", "Delta-pubKey");
 
         Blockchain blockchain = new Blockchain(TEST_CHAIN_NAME);
         Block genesis = new Block(1, Instant.now(), new ArrayList<>(), 1, null);
 
-        databaseService.createBlockchain(TEST_CHAIN_NAME, genesis);
+        neo4jService.createBlockchain(TEST_CHAIN_NAME, genesis);
 
         Team t1 = new Team("Alpha", "Bravo");
         Team t2 = new Team("Charly", "Delta");
@@ -46,30 +46,30 @@ public class DatabaseServiceTest {
         Game game1 = new Game(t1, t2, new Score(10, 3));
         List<Game> games1 = Collections.singletonList(game1);
         Block block = new Block(2, Instant.now(), games1, 2, "preHash 1");
-        databaseService.addBlock(TEST_CHAIN_NAME, block);
+        neo4jService.addBlock(TEST_CHAIN_NAME, block);
 
         Game game2 = new Game(t1, t2, new Score(10, 7));
         List<Game> games2 = Collections.singletonList(game2);
         block = new Block(3, Instant.now(), games2, 3, "preHash 2");
-        databaseService.addBlock(TEST_CHAIN_NAME, block);
+        neo4jService.addBlock(TEST_CHAIN_NAME, block);
 
-        Blockchain blockchain1 = databaseService.loadBlockchain(TEST_CHAIN_NAME);
+        Blockchain blockchain1 = neo4jService.loadBlockchain(TEST_CHAIN_NAME);
         System.out.println(blockchain1);
 
-        databaseService.deleteBlockchain(TEST_CHAIN_NAME);
-        databaseService.deletePlayer("Alpha");
-        databaseService.deletePlayer("Bravo");
-        databaseService.deletePlayer("Charly");
-        databaseService.deletePlayer("Delta");
+        neo4jService.deleteBlockchain(TEST_CHAIN_NAME);
+        neo4jService.deletePlayer("Alpha");
+        neo4jService.deletePlayer("Bravo");
+        neo4jService.deletePlayer("Charly");
+        neo4jService.deletePlayer("Delta");
     }
 
     @Test
     @Ignore
     public void createPlayer() {
-        databaseService.createPlayer("P1", "P1-pubKey");
-        databaseService.createPlayer("P2", "P2-pubKey");
-        databaseService.createPlayer("P3", "P3-pubKey");
-        databaseService.createPlayer("P4", "P4-pubKey");
+        neo4jService.createPlayer("P1", "P1-pubKey");
+        neo4jService.createPlayer("P2", "P2-pubKey");
+        neo4jService.createPlayer("P3", "P3-pubKey");
+        neo4jService.createPlayer("P4", "P4-pubKey");
     }
 
 }

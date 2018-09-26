@@ -2,12 +2,7 @@ package de.smartsquare.kickchain;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.smartsquare.kickchain.domain.Game;
-import de.smartsquare.kickchain.domain.Score;
-import de.smartsquare.kickchain.domain.Team;
 import de.smartsquare.kickchain.service.ConsensusService;
-import de.smartsquare.kickchain.service.DatabaseService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -33,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 
-public class KickchainControllerTest {
+public class KickchainAdministrationControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -46,20 +41,27 @@ public class KickchainControllerTest {
     private ConsensusService consensusService;
 
 
-    @MockBean
-    private DatabaseService databaseService;
-
+    @Test
+    public void testNewChain() throws Exception {
+        mvc.perform(get("/admin/chain/testchain/new")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
-    @Ignore // ignore until neo4j implementation is finished
-    public void testNewGame() throws Exception {
-        Team team1 = new Team("A");
-        Team team2 = new Team("B", "C");
-        Score score = new Score(10, 3);
-        Game game = new Game(team1, team2, score);
-        mvc.perform(post("/game/new")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(game)))
+    public void testChainNotThere() throws Exception {
+        mvc.perform(get("/admin/chain/testchain")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testChainAfterCreated() throws Exception {
+        mvc.perform(get("/admin/chain/testchain/new")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        mvc.perform(get("/admin/chain/testchain")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -72,7 +74,7 @@ public class KickchainControllerTest {
         Mockito.when(consensusService.getNodes()).thenReturn(nodes);
 
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, false);
-        MvcResult result = mvc.perform(post("/nodes/register")
+        MvcResult result = mvc.perform(post("/admin/nodes/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(node))
                 .andExpect(status().isCreated()).andReturn();
@@ -83,17 +85,10 @@ public class KickchainControllerTest {
 
     @Test
     public void testRegister_fail() throws Exception {
-        mvc.perform(post("/nodes/register")
+        mvc.perform(post("/admin/nodes/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    @Ignore
-    public void testResolve() throws Exception {
-        mvc.perform(get("/nodes/resolve")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
 }
