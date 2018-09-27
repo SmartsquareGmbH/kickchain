@@ -5,6 +5,8 @@ import de.smartsquare.kickchain.domain.Block;
 import de.smartsquare.kickchain.domain.Blockchain;
 import de.smartsquare.kickchain.domain.Proof;
 import de.smartsquare.kickchain.domain.ZeroPaddedHashProof;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,8 @@ public class ConsensusService {
     private final Proof<Boolean> proof;
 
     private final Set<String> nodes = new HashSet<>();
+
+    private final Logger logger = LoggerFactory.getLogger(ConsensusService.class);
 
     @PostConstruct
     public void postConstruct() {
@@ -62,10 +66,23 @@ public class ConsensusService {
                     .collect(Collectors.toList());
 
             for (Block b : collect) {
+                // check proof of work
                 if (!proof.apply(latestBlock.getProof(), b.getProof())) {
                     return false;
                 }
                 latestBlock = b;
+            }
+
+            // check all previous hashes
+            Block lastBlock = null;
+            for (Block b : their.getChain()) {
+                if (lastBlock != null) {
+                    logger.info(String.format("Block %d has previous hash %s and lastBlockHash is %s", b.getIndex(), b.getPreviousHash(), lastBlock.toHash()));
+                    if (!b.getPreviousHash().equals(lastBlock.toHash())) {
+                        return false;
+                    }
+                }
+                lastBlock = b;
             }
 
             return true;

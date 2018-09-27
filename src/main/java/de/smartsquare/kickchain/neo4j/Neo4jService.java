@@ -173,7 +173,8 @@ public class Neo4jService implements DatabaseService {
                         new Team(g.getTeam2()),
 //                new Team(g.getTeam1().stream().map(PlayerNodeEntity::getName).collect(Collectors.toList())),
 //                new Team(g.getTeam2().stream().map(PlayerNodeEntity::getName).collect(Collectors.toList())),
-                        new Score(g.getScore1(), g.getScore2())
+                        new Score(g.getScore1(), g.getScore2()),
+                        "signature"
                 );
     }
 

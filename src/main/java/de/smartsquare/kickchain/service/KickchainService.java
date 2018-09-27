@@ -22,7 +22,9 @@ public class KickchainService {
     }
 
     public Block newGame(Block lastBlock, Game game) throws BlockchainException {
-        return miningService.mine(lastBlock, Collections.singletonList(game));
+        Block minedBlock = miningService.mine(lastBlock, Collections.singletonList(game));
+
+        return minedBlock;
     }
 
 }

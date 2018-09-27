@@ -33,7 +33,7 @@ public class KickchainApiControllerTest {
         Team team1 = new Team("A");
         Team team2 = new Team("B", "C");
         Score score = new Score(10, 3);
-        Game game = new Game(team1, team2, score);
+        Game game = new Game(team1, team2, score, "test signature");
         mvc.perform(post("/game/new")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(game)))

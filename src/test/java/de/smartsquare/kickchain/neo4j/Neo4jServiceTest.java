@@ -43,12 +43,12 @@ public class Neo4jServiceTest {
         Team t1 = new Team("Alpha", "Bravo");
         Team t2 = new Team("Charly", "Delta");
 
-        Game game1 = new Game(t1, t2, new Score(10, 3));
+        Game game1 = new Game(t1, t2, new Score(10, 3), "test signature");
         List<Game> games1 = Collections.singletonList(game1);
         Block block = new Block(2, Instant.now(), games1, 2, "preHash 1");
         neo4jService.addBlock(TEST_CHAIN_NAME, block);
 
-        Game game2 = new Game(t1, t2, new Score(10, 7));
+        Game game2 = new Game(t1, t2, new Score(10, 7), "test signature");
         List<Game> games2 = Collections.singletonList(game2);
         block = new Block(3, Instant.now(), games2, 3, "preHash 2");
         neo4jService.addBlock(TEST_CHAIN_NAME, block);

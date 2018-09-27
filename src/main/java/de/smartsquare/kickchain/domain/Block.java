@@ -2,6 +2,8 @@ package de.smartsquare.kickchain.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.smartsquare.kickchain.MessageDigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -18,6 +20,8 @@ public class Block {
     private List<Game> content;
 
     private long proof;
+
+    private final Logger logger = LoggerFactory.getLogger(Block.class);
 
     public Block(long index, Instant timestamp, List<Game> blockContent, long proof, String previousHash) {
         this.index = index;
@@ -54,7 +58,9 @@ public class Block {
         ObjectMapper mapper = new ObjectMapper();
         StringWriter writer = new StringWriter();
         mapper.writeValue(writer, this);
-        return MessageDigestUtils.sha256(writer.toString());
+        String blockAsString = writer.toString();
+        logger.info(String.format("Block with index %d as string: %s", index, blockAsString));
+        return MessageDigestUtils.sha256(blockAsString);
     }
 
 }

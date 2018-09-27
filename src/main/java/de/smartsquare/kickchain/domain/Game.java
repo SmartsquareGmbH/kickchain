@@ -1,9 +1,5 @@
 package de.smartsquare.kickchain.domain;
 
-import de.smartsquare.kickchain.BlockchainException;
-import de.smartsquare.kickchain.MessageDigestUtils;
-
-import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 public class Game implements BlockContent {
@@ -11,14 +7,16 @@ public class Game implements BlockContent {
     private Team team1;
     private Team team2;
     private Score score;
+    private String signature;
 
     public Game() {
     }
 
-    public Game(Team team1, Team team2, Score score) {
+    public Game(Team team1, Team team2, Score score, String signature) {
         this.team1 = team1;
         this.team2 = team2;
         this.score = score;
+        this.signature = signature;
     }
 
     public Team getTeam1() {
@@ -33,25 +31,8 @@ public class Game implements BlockContent {
         return score;
     }
 
-    @Override
-    public String getTransactionId() {
-        String trxHash = String.format("%d-%d-%d", team1.hashCode(), team2.hashCode(), score.hashCode());
-        try {
-            return MessageDigestUtils.sha256(trxHash);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return trxHash;
-        }
-    }
-
-    @Override
-    public String getSignature() throws BlockchainException {
-        try {
-            return MessageDigestUtils.sha256(String.format("%s", getTransactionId()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new BlockchainException("Unable to get Signature for transaction " + getTransactionId());
-        }
+    public String getSignature() {
+        return signature;
     }
 
     @Override
@@ -69,4 +50,7 @@ public class Game implements BlockContent {
 
         return Objects.hash(team1, team2, score);
     }
+
+
+
 }
