@@ -26,12 +26,12 @@ public class MiningService {
 
     Block mine(Block lastBlock, List<Game> transactions) throws BlockchainException {
         try {
-            long proofOfWork = proofOfWork(lastBlock.getProof());
-            logger.info("Mining Block started. LastBlock index is " + lastBlock.getIndex());
+            long proofOfWork = proofOfWork(lastBlock.getHeader().getProof());
+            logger.info("Mining Block started. LastBlock index is " + lastBlock.getHeader().getIndex());
 
-            String previousHash = lastBlock.toHash();
+            String previousHash = lastBlock.getHeader().toHash();
             return new Block(
-                    lastBlock.getIndex() + 1,
+                    lastBlock.getHeader().getIndex() + 1,
                     Instant.now(),
                     transactions,
                     proofOfWork,

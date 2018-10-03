@@ -13,54 +13,26 @@ import java.util.List;
 
 public class Block {
 
-    private long index;
-    private Instant timestamp;
-    private String previousHash;
-
+    private BlockHeader header;
     private List<Game> content;
 
-    private long proof;
-
-    private final Logger logger = LoggerFactory.getLogger(Block.class);
-
     public Block(long index, Instant timestamp, List<Game> blockContent, long proof, String previousHash) {
-        this.index = index;
-        this.timestamp = timestamp;
+        header = new BlockHeader(index, timestamp, MessageDigestUtils.transactionHash(blockContent), previousHash, proof);
         this.content = blockContent;
-        this.proof = proof;
-        this.previousHash = previousHash;
     }
 
     private Block() {
     }
 
-    public long getIndex() {
-        return index;
-    }
 
-    public Instant getTimestamp() {
-        return timestamp;
+    public BlockHeader getHeader() {
+        return header;
     }
 
     public List<Game> getContent() {
         return content;
     }
 
-    public long getProof() {
-        return proof;
-    }
 
-    public String getPreviousHash() {
-        return previousHash;
-    }
-
-    public String toHash() throws IOException, NoSuchAlgorithmException {
-        ObjectMapper mapper = new ObjectMapper();
-        StringWriter writer = new StringWriter();
-        mapper.writeValue(writer, this);
-        String blockAsString = writer.toString();
-        logger.info(String.format("Block with index %d as string: %s", index, blockAsString));
-        return MessageDigestUtils.sha256(blockAsString);
-    }
 
 }

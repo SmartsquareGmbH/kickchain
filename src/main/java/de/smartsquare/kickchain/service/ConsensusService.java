@@ -55,19 +55,19 @@ public class ConsensusService {
     private boolean validChain(Blockchain mine, Blockchain their) throws BlockchainException {
         try {
             Block mineLast = mine.lastBlock();
-            Block theirMiddle = their.getByIndex(mineLast.getIndex());
-            if (!mineLast.toHash().equals(theirMiddle.toHash())) {
+            Block theirMiddle = their.getByIndex(mineLast.getHeader().getIndex());
+            if (!mineLast.getHeader().toHash().equals(theirMiddle.getHeader().toHash())) {
                 return false;
             }
 
             Block latestBlock = theirMiddle;
             List<Block> collect = their.getChain().stream()
-                    .filter(b -> b.getIndex() > mineLast.getIndex())
+                    .filter(b -> b.getHeader().getIndex() > mineLast.getHeader().getIndex())
                     .collect(Collectors.toList());
 
             for (Block b : collect) {
                 // check proof of work
-                if (!proof.apply(latestBlock.getProof(), b.getProof())) {
+                if (!proof.apply(latestBlock.getHeader().getProof(), b.getHeader().getProof())) {
                     return false;
                 }
                 latestBlock = b;
@@ -77,8 +77,8 @@ public class ConsensusService {
             Block lastBlock = null;
             for (Block b : their.getChain()) {
                 if (lastBlock != null) {
-                    logger.info(String.format("Block %d has previous hash %s and lastBlockHash is %s", b.getIndex(), b.getPreviousHash(), lastBlock.toHash()));
-                    if (!b.getPreviousHash().equals(lastBlock.toHash())) {
+                    logger.info(String.format("Block %d has previous hash %s and lastBlockHash is %s", b.getHeader().getIndex(), b.getHeader().getPreviousHash(), lastBlock.getHeader().toHash()));
+                    if (!b.getHeader().getPreviousHash().equals(lastBlock.getHeader().toHash())) {
                         return false;
                     }
                 }

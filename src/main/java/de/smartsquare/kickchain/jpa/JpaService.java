@@ -1,7 +1,5 @@
 package de.smartsquare.kickchain.jpa;
 
-import de.smartsquare.kickchain.BlockchainException;
-import de.smartsquare.kickchain.MessageDigestUtils;
 import de.smartsquare.kickchain.domain.*;
 import de.smartsquare.kickchain.jpa.entities.BlockEntity;
 import de.smartsquare.kickchain.jpa.entities.GameEntity;
@@ -12,7 +10,6 @@ import de.smartsquare.kickchain.jpa.repository.JpaPlayerRepository;
 import de.smartsquare.kickchain.service.DatabaseService;
 import org.springframework.stereotype.Service;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -67,10 +64,10 @@ public class JpaService implements DatabaseService {
         List<Game> content = block.getContent();
         List<GameEntity> gameEntities = getGameEntities(content);
         blockEntity.setGames(gameEntities);
-        blockEntity.setIndex(block.getIndex());
-        blockEntity.setPreviousHash(block.getPreviousHash());
-        blockEntity.setProof(block.getProof());
-        blockEntity.setTimestamp(block.getTimestamp());
+        blockEntity.setIndex(block.getHeader().getIndex());
+        blockEntity.setPreviousHash(block.getHeader().getPreviousHash());
+        blockEntity.setProof(block.getHeader().getProof());
+        blockEntity.setTimestamp(block.getHeader().getTimestamp());
         return blockEntity;
     }
 
@@ -82,6 +79,7 @@ public class JpaService implements DatabaseService {
                 ge.setScore2(g.getScore().getGoals2());
                 ge.setTeam1(g.getTeam1().getPlayers());
                 ge.setTeam2(g.getTeam2().getPlayers());
+                ge.setSignature(g.getSignature());
                 ge = gameRepository.save(ge);
                 return ge;
             }).collect(Collectors.toList());
@@ -123,7 +121,8 @@ public class JpaService implements DatabaseService {
             Team team1 = new Team(ge.getTeam1());
             Team team2 = new Team(ge.getTeam2());
             Score score = new Score(ge.getScore1(), ge.getScore2());
-            return new Game(team1, team2, score, "signature");
+            String signature = ge.getSignature();
+            return new Game(team1, team2, score, signature);
         }).collect(Collectors.toList());
     }
 

@@ -28,10 +28,8 @@ public class ConsensusScheduler {
             Blockchain blockchain = jpaService.loadBlockchain(KICKCHAIN);
         Blockchain resolvedChain = consensusService.resolveConflicts(blockchain);
             List<Block> nodesToAdd = resolvedChain.getChain().stream()
-                    .filter(b -> b.getIndex() > blockchain.lastIndex())
-                    .collect(Collectors.toList(
-
-                    ));
+                    .filter(b -> b.getHeader().getIndex() > blockchain.lastIndex())
+                    .collect(Collectors.toList());
             for (Block b : nodesToAdd) {
                 jpaService.addBlock(KICKCHAIN, b);
             }

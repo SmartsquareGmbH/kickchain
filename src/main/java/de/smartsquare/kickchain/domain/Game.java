@@ -42,13 +42,14 @@ public class Game implements BlockContent {
         Game game = (Game) o;
         return Objects.equals(team1, game.team1) &&
                 Objects.equals(team2, game.team2) &&
-                Objects.equals(score, game.score) ;
+                Objects.equals(score, game.score) &&
+                Objects.equals(signature, game.signature);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(team1, team2, score);
+        return Objects.hash(team1, team2, score, signature);
     }
 
 

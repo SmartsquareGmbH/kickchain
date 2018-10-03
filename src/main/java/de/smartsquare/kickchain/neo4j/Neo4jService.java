@@ -64,11 +64,11 @@ public class Neo4jService implements DatabaseService {
 
     private BlockNodeEntity getBlockNodeEntity(String blockchain, Block block) {
         BlockNodeEntity blockNodeEntity = new BlockNodeEntity();
-        blockNodeEntity.setProof(block.getProof());
-        blockNodeEntity.setTimestamp(block.getTimestamp());
+        blockNodeEntity.setProof(block.getHeader().getProof());
+        blockNodeEntity.setTimestamp(block.getHeader().getTimestamp());
         blockNodeEntity.setBlockchain(blockchain);
-        blockNodeEntity.setIndex(block.getIndex());
-        blockNodeEntity.setPreviousHash(block.getPreviousHash());
+        blockNodeEntity.setIndex(block.getHeader().getIndex());
+        blockNodeEntity.setPreviousHash(block.getHeader().getPreviousHash());
 
         return blockNodeEntity;
     }

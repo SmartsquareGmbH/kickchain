@@ -48,7 +48,7 @@ public class Blockchain {
         if (chain.isEmpty()) {
             throw new NoSuchElementException("Chain is empty.");
         }
-        return chain.stream().filter(b -> b.getIndex() == idx).findFirst().get();
+        return chain.stream().filter(b -> b.getHeader().getIndex() == idx).findFirst().get();
     }
 
     public int lastIndex() {

@@ -1,0 +1,75 @@
+{
+  "name": "Kickchain",
+  "chain": [
+    {
+      "header": {
+        "index": 0,
+        "timestamp": null,
+        "transactionHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "previousHash": null,
+        "proof": 100
+      },
+      "content": []
+    },
+    {
+      "header": {
+        "index": 1,
+        "timestamp": "2018-09-28T11:37:20.511Z",
+        "transactionHash": "e4a61578b40d48965909d05b4f7409f920dc11535bcd948ea477e2c18a619b48",
+        "previousHash": "ae428540ff24893d664b7216eb94f89682274280be890a567d01224e7b8123ce",
+        "proof": 40663
+      },
+      "content": [
+        {
+          "team1": {
+            "players": [
+              "Alice",
+              "Bob"
+            ]
+          },
+          "team2": {
+            "players": [
+              "Eve",
+              "Mallory"
+            ]
+          },
+          "score": {
+            "goals1": 10,
+            "goals2": 1
+          },
+          "signature": null
+        }
+      ]
+    },
+    {
+      "header": {
+        "index": 2,
+        "timestamp": "2018-09-28T11:39:44.852Z",
+        "transactionHash": "15194f235b808019cfe2f9e0bb9ce6ca0aa241ceeeb70ce458a3030dcc981f81",
+        "previousHash": "9a8a3e5c62c14a46d1e6a95f0a2f29dd8bb15853e3d388bd267faa8cd9343fd3",
+        "proof": 121820
+      },
+      "content": [
+        {
+          "team1": {
+            "players": [
+              "Mallory",
+              "Bob"
+            ]
+          },
+          "team2": {
+            "players": [
+              "Eve",
+              "Alice"
+            ]
+          },
+          "score": {
+            "goals1": 8,
+            "goals2": 10
+          },
+          "signature": null
+        }
+      ]
+    }
+  ]
+}
