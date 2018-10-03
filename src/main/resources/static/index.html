@@ -2,7 +2,7 @@
 <html>
 <head>
     <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
-    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@1.2.6/dist/vuetify.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 <body>
@@ -11,77 +11,100 @@
         <template>
             <div>
                 <v-toolbar flat color="white">
-                    <v-toolbar-title>blockchain for kicker games</v-toolbar-title>
-                    <v-divider
-                            class="mx-2"
-                            inset
-                            vertical
-                    ></v-divider>
+                    <v-toolbar-title>Kickchain | Blockchain for foosball games</v-toolbar-title>
                     <v-spacer></v-spacer>
+
                     <v-dialog v-model="dialog" max-width="500px">
-                        <v-btn slot="activator" color="primary" dark class="mb-2">
+                        <v-btn slot="activator" color="primary" dark>
                             <v-icon dark>add</v-icon>
                         </v-btn>
 
                         <v-card>
                             <v-form ref="form" v-model="valid" lazy-validation>
-                                <v-card-title class="headline primary"
-                                              primary-title>
-                                    <span class="headline white--text">new game</span>
+                                <v-card-title class="headline primary" primary-title>
+                                    <span class="headline white--text">New game</span>
                                 </v-card-title>
 
                                 <v-card-text>
-                                    <v-list three-line subheader>
                                         <v-subheader>Team 1</v-subheader>
                                         <v-container grid-list-md>
-                                            <v-layout Fnowrap>
+                                            <v-layout>
                                                 <v-flex xs12 sm6 md4>
-                                                    <v-text-field v-model="input.team1.players[0]"
-                                                                  label="player 1"
-                                                                  placeholder="Placeholder"
-                                                                  :rules="nameRules"
-                                                                  required></v-text-field>
+                                                    <v-text-field
+                                                            ref="firstPlayer"
+                                                            v-model="input.team1.players[0]"
+                                                            label="Player 1"
+                                                            placeholder="Player name"
+                                                            :rules="nameRules"
+                                                            validate-on-blur
+                                                            required
+                                                            :hide-details="false"
+                                                    >
+                                                    </v-text-field>
                                                 </v-flex>
                                                 <v-flex xs12 sm6 md4>
-                                                    <v-text-field v-model="input.team1.players[1]"
-                                                                  label="player 2"
-                                                                  placeholder="Placeholder"></v-text-field>
+                                                    <v-text-field
+                                                            v-model="input.team1.players[1]"
+                                                            label="Player 2"
+                                                            placeholder="Player name"
+                                                    ></v-text-field>
                                                 </v-flex>
                                                 <v-flex xs12 sm6 md4>
-                                                    <v-text-field v-model="input.score.goals1" label="goals"
-                                                                  mask="##" :rules="goalsRules"></v-text-field>
+                                                    <v-text-field
+                                                            v-model="input.score.goals1"
+                                                            label="Goals"
+                                                            placeholder="0"
+                                                            min="0"
+                                                            max="10"
+                                                            step="1"
+                                                            type="number"
+                                                            validate-on-blur
+                                                            :rules="goalsRules"
+                                                    ></v-text-field>
                                                 </v-flex>
                                             </v-layout>
                                         </v-container>
                                         <v-subheader>Team 2</v-subheader>
                                         <v-container grid-list-md>
-                                            <v-layout nowrap>
+                                            <v-layout>
                                                 <v-flex xs12 sm6 md4>
-                                                    <v-text-field v-model="input.team2.players[0]"
-                                                                  label="player 1"
-                                                                  placeholder="Placeholder"
-                                                                  :rules="nameRules"
-                                                                  required></v-text-field>
+                                                    <v-text-field
+                                                            v-model="input.team2.players[0]"
+                                                            label="Player 1"
+                                                            placeholder="Player name"
+                                                            validate-on-blur
+                                                            :rules="nameRules"
+                                                            required
+                                                    ></v-text-field>
                                                 </v-flex>
                                                 <v-flex xs12 sm6 md4>
-                                                    <v-text-field v-model="input.team2.players[1]"
-                                                                  label="player 2"
-                                                                  placeholder="Placeholder"></v-text-field>
+                                                    <v-text-field
+                                                            v-model="input.team2.players[1]"
+                                                            label="Player 2"
+                                                            placeholder="Player name"
+                                                    ></v-text-field>
                                                 </v-flex>
                                                 <v-flex xs12 sm6 md4>
-                                                    <v-text-field v-model="input.score.goals2"
-                                                                  label="goals" mask="##"
-                                                                  :rules="goalsRules"></v-text-field>
+                                                    <v-text-field
+                                                            v-model="input.score.goals2"
+                                                            label="Goals"
+                                                            placeholder="0"
+                                                            min="0"
+                                                            max="10"
+                                                            step="1"
+                                                            type="number"
+                                                            validate-on-blur
+                                                            :rules="goalsRules"
+                                                    ></v-text-field>
                                                 </v-flex>
                                             </v-layout>
                                         </v-container>
-                                    </v-list>
                                 </v-card-text>
 
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
-                                    <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-                                    <v-btn color="blue darken-1" flat @click.native="save" :disabled="!valid">Save
+                                    <v-btn color="blue darken-1" flat @click="dialog = false">Cancel</v-btn>
+                                    <v-btn color="blue darken-1" flat @click="save">Save
                                     </v-btn>
                                 </v-card-actions>
                             </v-form>
@@ -89,93 +112,112 @@
                     </v-dialog>
                 </v-toolbar>
             </div>
-            <div>
-                <p v-text="chain"></p>
-            </div>
+
+            <v-data-table
+                    :headers="headers"
+                    :items="chain"
+                    hide-actions
+                    class="elevation-1"
+            >
+                <template slot="items" slot-scope="props">
+                    <td class="text-xs-left">{{ props.item.index }}</td>
+                    <td class="text-xs-left">{{ props.item.team1 }}</td>
+                    <td class="text-xs-left">{{ props.item.team2 }}</td>
+                    <td class="text-xs-right">{{ props.item.result }}</td>
+                </template>
+            </v-data-table>
         </template>
     </v-app>
 </div>
 
-<script src="https://unpkg.com/vue/dist/vue.js"></script>
-<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@1.2.6/dist/vuetify.min.js"></script>
 <script>
-    var app = new Vue({
-        el: '#app',
-        data: {
-            valid: true,
-            dialog: false,
-            goalsRules: [
-                v => !!v || 'goals for team are required',
-                v => (v && v >= 0 && v <= 10) || 'Goals must be between 0 - 10'
-            ],
-            nameRules: [
-                v => !!v || 'Name is required',
-                v => (v && v.length <= 10) || 'Name must be less than 10 characters'
-            ],
-            headers: [
-                {text: '#', value: 'idx', sortable: false},
-                {text: 'Team 1', value: 'team1'},
-                {text: 'Team 2', value: 'team2'},
-                {text: 'Result', value: 'result', align: 'right'},
-            ],
-            chain: [],
-            input: {
-                team1: {players: []},
-                team2: {players: []},
-                score: {
-                    goals1: 0,
-                    goals2: 0
-                }
-            }
-        },
-        watch: {
-            dialog(val) {
-                val || this.close()
-            }
-        },
-        created() {
-            this.initialize()
-        },
-        methods: {
-            initialize() {
-                fetch('chain')
-                    .then(response => response.json())
-                    .then(data => {
-                        this.chain = data.chain.filter(function (block) {
-                            return block.content != null
-                        })
-                    })
-            },
-            resetInput() {
-                this.input.team1.players = [];
-                this.input.team2.players = [];
-                this.input.score.goals1 = 0;
-                this.input.score.goals2 = 0;
-            },
-            save() {
-                if (this.$refs.form.validate()) {
-                    fetch('game/new', {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(this.input),
-                    }).then((res) => res.json())
-                        .then((data) => this.chain = data.chain.filter(function (block) {
-                            return block.content != null
-                        }))
-                        .then(this.close())
-                        .catch((err) => console.log(err))
-                }
-            },
-            close() {
-                this.resetInput();
-                this.dialog = false;
-            },
+var app = new Vue({
+  el: '#app',
+  data: {
+    valid: true,
+    dialog: false,
+    goalsRules: [
+      v => !!v || 'Goals for team are required',
+      v => (v && v >= 0 && v <= 10) || 'Goals must be between 0 - 10'
+    ],
+    nameRules: [
+      v => !!v || 'Name is required',
+      v => (v && v.length <= 10) || 'Name must be less than 10 characters'
+    ],
+    headers: [
+      { text: '#', value: 'index' },
+      { text: 'Team 1', value: 'team1' },
+      { text: 'Team 2', value: 'team2' },
+      { text: 'Result', value: 'result', align: 'right', sortable: false },
+    ],
+    chain: [],
+    input: {
+      team1: { players: [] },
+      team2: { players: [] },
+      score: {
+        goals1: 0,
+        goals2: 0
+      }
+    }
+  },
 
-        }
-    })
+  watch: {
+    dialog(val) {
+      if (val) {
+        this.$nextTick().then(() => {
+          this.$refs.form.reset();
+          this.$refs.firstPlayer.focus();
+        });
+      }
+    }
+  },
+
+  created() {
+    this.initialize()
+  },
+
+  methods: {
+    initialize() {
+      fetch('chain')
+        .then(response => response.json())
+        .then(data => this.parseAndAssignChain(data.chain))
+    },
+
+    save() {
+      if (this.$refs.form.validate()) {
+        fetch('game/new', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(this.input),
+        })
+          .then(res => res.json())
+          .then(data => this.parseAndAssignChain(data.chain))
+          .then(this.dialog = false)
+          .catch(err => console.log(err))
+      }
+    },
+
+    parseAndAssignChain(chain) {
+      this.chain = chain
+        .filter(function(block) {
+          return Array.isArray(block.content) && block.content.length;
+        })
+        .map(it => {
+          return {
+            index: it.header.index,
+            team1: it.content[0].team1.players.join(" & "),
+            team2: it.content[0].team2.players.join(" & "),
+            result: it.content[0].score.goals1 + " : " + it.content[0].score.goals2
+          }
+        })
+    },
+  }
+})
 </script>
 </body>
 </html>
