@@ -8,6 +8,9 @@ Inspired by https://hackernoon.com/learn-blockchains-by-building-one-117428612f4
 
 ## Prerequisites
 
+You can either use a JPA database backend or a Neo4j server. By default the JPA backend is enabled with an in-memory h2 database.
+To change that you need to modify the property 'database.type' to 'jpa' or 'neo4j'.
+
 ### Neo4J
 
 Install and setup a Neo4j server. 
