@@ -24,37 +24,37 @@ public class KickchainAdministrationController {
 
     private final ConsensusService consensusService;
 
-    private final DatabaseService jpaService;
+    private final DatabaseService databaseService;
 
     @Autowired
-    public KickchainAdministrationController(KickchainService kickchainService, ConsensusService consensusService, DatabaseService jpaService) {
+    public KickchainAdministrationController(KickchainService kickchainService, ConsensusService consensusService, DatabaseService databaseService) {
         this.kickchainService = kickchainService;
         this.consensusService = consensusService;
-        this.jpaService = jpaService;
+        this.databaseService = databaseService;
     }
 
     @GetMapping(value = "/chain/{name}")
     @ResponseBody
     public Blockchain fullChain(@PathVariable("name") String name) {
-        return jpaService.loadBlockchain(name);
+        return databaseService.loadBlockchain(name);
     }
 
     @GetMapping(value = "/chain/{name}/new")
     @ResponseBody
     public ResponseEntity<?> newChain(@PathVariable("name") String name) {
-        if (jpaService.loadBlockchain(name) != null) {
+        if (databaseService.loadBlockchain(name) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Blockchain " + name +" not found.");
         }
         Block genesisBlock = kickchainService.create();
-        jpaService.createBlockchain(name, genesisBlock);
-        Blockchain blockchain = jpaService.loadBlockchain(name);
+        databaseService.createBlockchain(name, genesisBlock);
+        Blockchain blockchain = databaseService.loadBlockchain(name);
         return ResponseEntity.ok(blockchain);
     }
 
     @GetMapping(value = "/chain/{name}/resolve")
     @ResponseBody
     public ResponseEntity<?> consensus(@PathVariable("name") String name) {
-        Blockchain blockchain = jpaService.loadBlockchain(name);
+        Blockchain blockchain = databaseService.loadBlockchain(name);
         if (blockchain == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Blockchain " + name +" not found.");
         }
@@ -63,7 +63,7 @@ public class KickchainAdministrationController {
                 .filter(b -> b.getHeader().getIndex() >= blockchain.lastIndex())
                 .collect(Collectors.toList());
         for (Block b : nodesToAdd) {
-            jpaService.addBlock(name, b);
+            databaseService.addBlock(name, b);
         }
         return ResponseEntity.ok(resolvedChain);
     }
@@ -71,6 +71,17 @@ public class KickchainAdministrationController {
     @PostMapping(value = "/nodes/register")
     @ResponseBody
     public ResponseEntity<?> registerNodes(@RequestBody String node) {
+
+        if (node == null || node.equals("")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Please supply a valid list of nodes");
+        }
+        consensusService.registerNode(node);
+        return ResponseEntity.status(HttpStatus.CREATED).body(consensusService.getNodes());
+    }
+
+    @PostMapping(value = "/nodes/unregister")
+    @ResponseBody
+    public ResponseEntity<?> unregisterNodes(@RequestBody String node) {
 
         if (node == null || node.equals("")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Please supply a valid list of nodes");

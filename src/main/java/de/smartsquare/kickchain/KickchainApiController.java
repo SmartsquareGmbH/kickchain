@@ -22,19 +22,19 @@ public class KickchainApiController {
     public static final String KICKCHAIN = "Kickchain";
 
     private final KickchainService kickchainService;
-    private final DatabaseService jpaService;
+    private final DatabaseService databaseService;
 
     @Autowired
-    public KickchainApiController(KickchainService kickchainService, DatabaseService jpaService) {
+    public KickchainApiController(KickchainService kickchainService, DatabaseService databaseService) {
         this.kickchainService = kickchainService;
-        this.jpaService = jpaService;
+        this.databaseService = databaseService;
     }
 
     @PostConstruct
     public void init() {
         Blockchain blockchain = null;
         try {
-            blockchain = jpaService.loadBlockchain(KICKCHAIN);
+            blockchain = databaseService.loadBlockchain(KICKCHAIN);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,21 +46,21 @@ public class KickchainApiController {
     @PostMapping(value = "/game/new")
     @ResponseBody
     public ResponseEntity<?> newGame(@RequestBody Game game) throws BlockchainException {
-        Blockchain blockchain = jpaService.loadBlockchain(KICKCHAIN);
+        Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
         Block newBlock = kickchainService.newGame(blockchain.lastBlock(), game);
-        jpaService.addBlock(blockchain.getName(), newBlock);
+        databaseService.addBlock(blockchain.getName(), newBlock);
         return ResponseEntity.status(HttpStatus.CREATED).body(fullChain());
     }
 
     @GetMapping(value = "/chain")
     @ResponseBody
     public Blockchain fullChain() {
-        return jpaService.loadBlockchain(KICKCHAIN);
+        return databaseService.loadBlockchain(KICKCHAIN);
     }
 
     private void newChain(String name) {
         Block genesisBlock = kickchainService.create();
-        jpaService.createBlockchain(name, genesisBlock);
+        databaseService.createBlockchain(name, genesisBlock);
     }
 
 }

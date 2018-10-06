@@ -33,6 +33,9 @@ public class GameNodeEntity {
     @Property
     private int score2;
 
+    @Property
+    private String signature;
+
     public Long getId() {
         return id;
     }
@@ -79,6 +82,14 @@ public class GameNodeEntity {
 
     public void setScore2(int score2) {
         this.score2 = score2;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     @Override

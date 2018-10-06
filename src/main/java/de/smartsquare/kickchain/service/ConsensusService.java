@@ -52,6 +52,10 @@ public class ConsensusService {
         nodes.add(address);
     }
 
+    public void unregisterNode(String address) {
+        nodes.remove(address);
+    }
+
     private boolean validChain(Blockchain mine, Blockchain their) throws BlockchainException {
         try {
             Block mineLast = mine.lastBlock();

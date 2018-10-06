@@ -1,0 +1,43 @@
+<html>
+
+<head>
+    <title>Kickchain Administration</title>
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@1.2.6/dist/vuetify.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div id="app">
+
+    <header>
+        <h1 v-text="sitename"></h1>
+    </header>
+
+    <p>
+        <input v-model="nodeurl" placeholder="Enter the URL of a node">
+        <button v-on:click="connectNode">Connect</button>
+
+    </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@1.2.6/dist/vuetify.min.js"></script>
+<script type="text/javascript">
+    Vue.config.devtools = true
+    var app = new Vue({
+        el: '#app',
+        data: {
+            sitename: 'Kickchain Administration Tool',
+            nodeurl: ''
+        },
+        methods: {
+            connectNode: function(event) {
+            }
+        }
+    });
+
+</script>
+
+</body>
+
+</html>
