@@ -71,7 +71,6 @@ public class KickchainAdministrationController {
     @PostMapping(value = "/nodes/register")
     @ResponseBody
     public ResponseEntity<?> registerNodes(@RequestBody String node) {
-
         if (node == null || node.equals("")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Please supply a valid list of nodes");
         }
@@ -82,11 +81,10 @@ public class KickchainAdministrationController {
     @PostMapping(value = "/nodes/unregister")
     @ResponseBody
     public ResponseEntity<?> unregisterNodes(@RequestBody String node) {
-
         if (node == null || node.equals("")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Please supply a valid list of nodes");
         }
-        consensusService.registerNode(node);
+        consensusService.unregisterNode(node);
         return ResponseEntity.status(HttpStatus.CREATED).body(consensusService.getNodes());
     }
 

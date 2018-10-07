@@ -1,7 +1,7 @@
 version: '3'
 services: 
   kickchain:  
-    image: docker.smartsquare.de/kickchain:1
+    image: kickchain:latest
     command:
       - java
       - -Djava.security.egd=file:/dev/./urandom

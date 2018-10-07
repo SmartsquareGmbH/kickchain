@@ -69,6 +69,7 @@ public class Neo4jService implements DatabaseService {
         blockNodeEntity.setBlockchain(blockchain);
         blockNodeEntity.setIndex(block.getHeader().getIndex());
         blockNodeEntity.setPreviousHash(block.getHeader().getPreviousHash());
+        blockNodeEntity.setTransactionHash(block.getHeader().getTransactionHash());
 
         return blockNodeEntity;
     }
@@ -111,7 +112,6 @@ public class Neo4jService implements DatabaseService {
     public void addBlock(String name, Block block) {
         BlockNodeEntity lastBlock = blockRepository.findEndByBlockchain(name);
         BlockNodeEntity newBlock = getBlockNodeEntity(name, block);
-        newBlock.setIndex(lastBlock.getIndex() + 1);
 
         List<GameNodeEntity> gameNodeEntity = getGameNodeEntity(block.getContent());
         if (gameNodeEntity != null) {
@@ -174,8 +174,9 @@ public class Neo4jService implements DatabaseService {
 //                new Team(g.getTeam1().stream().map(PlayerNodeEntity::getName).collect(Collectors.toList())),
 //                new Team(g.getTeam2().stream().map(PlayerNodeEntity::getName).collect(Collectors.toList())),
                         new Score(g.getScore1(), g.getScore2()),
-                        "signature"
+                        g.getSignature()
                 );
+
     }
 
     @Override
@@ -183,7 +184,7 @@ public class Neo4jService implements DatabaseService {
         List<BlockNodeEntity> byBlockchain = blockRepository.findByBlockchain(name);
         if (byBlockchain.size() > 1) {
             byBlockchain = byBlockchain.stream()
-                    .sorted((c1, c2) -> (int) (c2.getIndex() - c1.getIndex()))
+                    .sorted((c1, c2) -> (int) (c1.getIndex() - c2.getIndex()))
                     .collect(Collectors.toList());
         }
 
@@ -191,14 +192,22 @@ public class Neo4jService implements DatabaseService {
 
         Blockchain blockchain = new Blockchain(name);
         for (BlockNodeEntity bne : byBlockchain) {
-            List<Game> games = bne.getGame() == null ? null : Collections.singletonList(getGame(bne.getGame()));
-            Block block = new Block(bne.getIndex(), bne.getTimestamp(), games, bne.getProof(), bne.getPreviousHash());
+            List<Game> games = bne.getGame() == null ? Collections.EMPTY_LIST : Collections.singletonList(getGame(bne.getGame()));
+            Block block = new Block(bne.getIndex(), bne.getTimestamp(), bne.getProof(), bne.getPreviousHash(), bne.getTransactionHash(), games);
             blockchain.addBlock(block);
         }
 
         return blockchain;
     }
 
+    private List<Game> getGames(BlockNodeEntity be) {
+        if (be.getGame() == null) {
+            return Collections.EMPTY_LIST;
+        }
+        List<Game> games = new ArrayList<>();
+        games.add(getGame(be.getGame()));
+        return games;
+    }
 
     @Override
     public void deleteBlockchain(String name) {

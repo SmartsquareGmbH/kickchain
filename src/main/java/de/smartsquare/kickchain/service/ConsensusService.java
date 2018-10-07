@@ -61,6 +61,9 @@ public class ConsensusService {
             Block mineLast = mine.lastBlock();
             Block theirMiddle = their.getByIndex(mineLast.getHeader().getIndex());
             if (!mineLast.getHeader().toHash().equals(theirMiddle.getHeader().toHash())) {
+                logger.info("My last block does not match their last block.");
+                logger.debug(mineLast.toString());
+                logger.debug(theirMiddle.toString());
                 return false;
             }
 
@@ -100,20 +103,30 @@ public class ConsensusService {
     }
 
     public Blockchain resolveConflicts(Blockchain mine) {
+        logger.info("resolveConflicts(" + mine + ") called...");
         Blockchain newChain = null;
         int maxLength = mine.getChain().size();
+        logger.debug("mine chain size is " + maxLength);
         for (String node : nodes) {
+            logger.info("Resolving node" + node + "...");
             try {
                 RestTemplate restTemplate = new RestTemplate();
                 ResponseEntity<Blockchain> response = restTemplate.getForEntity("http://" + node + "/chain", Blockchain.class);
+                logger.debug("response is " + response);
                 if (response.getStatusCode().equals(HttpStatus.OK)) {
-                    if (response.getBody().getChain().size() > maxLength && validChain(mine, response.getBody())) {
-                        maxLength = response.getBody().getChain().size();
-                        newChain = response.getBody();
+                    Blockchain blockchain = response.getBody();
+                    logger.debug("Blockchain from node " + node + " is " + blockchain);
+                    List<Block> chain = blockchain.getChain();
+                    logger.debug("their chain size is " + chain.size());
+                    if (chain.size() > maxLength && validChain(mine, blockchain)) {
+                        maxLength = chain.size();
+                        newChain = blockchain;
+                    } else {
+                        logger.info("Chain from node " + node + " is not longer or not valid.");
                     }
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.error("Unable to resolve conflict with node " + node, ex);
             }
         }
         if (newChain != null) {

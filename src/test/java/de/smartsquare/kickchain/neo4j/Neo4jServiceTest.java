@@ -1,7 +1,7 @@
 package de.smartsquare.kickchain.neo4j;
 
+import de.smartsquare.kickchain.MessageDigestUtils;
 import de.smartsquare.kickchain.domain.*;
-import de.smartsquare.kickchain.neo4j.Neo4jService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +36,8 @@ public class Neo4jServiceTest {
         neo4jService.createPlayer("Delta", "Delta-pubKey");
 
         Blockchain blockchain = new Blockchain(TEST_CHAIN_NAME);
-        Block genesis = new Block(1, Instant.now(), new ArrayList<>(), 1, null);
+        List<Game> games = new ArrayList<>();
+        Block genesis = new Block(1, Instant.now(), 1, null, MessageDigestUtils.transactionHash(games), games);
 
         neo4jService.createBlockchain(TEST_CHAIN_NAME, genesis);
 
@@ -45,12 +46,12 @@ public class Neo4jServiceTest {
 
         Game game1 = new Game(t1, t2, new Score(10, 3), "test signature");
         List<Game> games1 = Collections.singletonList(game1);
-        Block block = new Block(2, Instant.now(), games1, 2, "preHash 1");
+        Block block = new Block(2, Instant.now(), 2, "preHash 1", MessageDigestUtils.transactionHash(games1), games1);
         neo4jService.addBlock(TEST_CHAIN_NAME, block);
 
         Game game2 = new Game(t1, t2, new Score(10, 7), "test signature");
         List<Game> games2 = Collections.singletonList(game2);
-        block = new Block(3, Instant.now(), games2, 3, "preHash 2");
+        block = new Block(3, Instant.now(),3, "preHash 2", MessageDigestUtils.transactionHash(games2), games2);
         neo4jService.addBlock(TEST_CHAIN_NAME, block);
 
         Blockchain blockchain1 = neo4jService.loadBlockchain(TEST_CHAIN_NAME);

@@ -1,6 +1,7 @@
 package de.smartsquare.kickchain.service;
 
 import de.smartsquare.kickchain.BlockchainException;
+import de.smartsquare.kickchain.MessageDigestUtils;
 import de.smartsquare.kickchain.domain.Block;
 import de.smartsquare.kickchain.domain.Game;
 import de.smartsquare.kickchain.domain.Proof;
@@ -33,9 +34,10 @@ public class MiningService {
             return new Block(
                     lastBlock.getHeader().getIndex() + 1,
                     Instant.now(),
-                    transactions,
                     proofOfWork,
-                    previousHash);
+                    previousHash,
+                    MessageDigestUtils.transactionHash(transactions),
+                    transactions);
         } catch (Exception e) {
             throw new BlockchainException("Unable to get proof of work", e);
         }

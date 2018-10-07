@@ -48,10 +48,17 @@ public class Game implements BlockContent {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(team1, team2, score, signature);
     }
 
-
+    @Override
+    public String toString() {
+        return "Game{" +
+                "team1=" + team1 +
+                ", team2=" + team2 +
+                ", score=" + score +
+                ", signature='" + signature + '\'' +
+                '}';
+    }
 
 }

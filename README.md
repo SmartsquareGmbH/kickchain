@@ -31,4 +31,27 @@ Install and setup a Neo4j server.
 
     $ docker build . -t kickchain
     $ docker run -p 8080:8080 kickchain
-    
+
+## Web UI
+
+Navigate to
+
+    http://localhost:8080/
+
+## Administration REST calls
+
+### Register a connected node
+
+    $ curl -X POST --header "Content-Type: text/plain" http://localhost:8080/admin/nodes/register -d 'localhost:8080'
+
+### Unregister a connected node
+
+    $ curl -X --header "Content-Type: text/plain" POST http://localhost:8080/admin/nodes/unregister -d 'localhost:8080'
+
+### List all connected nodes
+
+    $ curl http://localhost:8080/admin/nodes/list
+
+### Resolve a chain
+
+    $ curl http://localhost:8090/admin/chain/Kickchain/resolve

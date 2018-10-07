@@ -54,4 +54,13 @@ public class Blockchain {
     public int lastIndex() {
         return chain.size();
     }
+
+    @Override
+    public String toString() {
+        String chainInfo = chain == null ? null : "[size: " + chain.size() + "]";
+        return "Blockchain{" +
+                "name='" + name + '\'' +
+                ", chain=" + chainInfo +
+                '}';
+    }
 }

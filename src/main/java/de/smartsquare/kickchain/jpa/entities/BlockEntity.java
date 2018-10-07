@@ -23,6 +23,8 @@ public class BlockEntity {
 
     private String previousHash;
 
+    private String transactionHash;
+
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "game_id")
     private List<GameEntity> games;
@@ -77,6 +79,14 @@ public class BlockEntity {
 
     public void setPreviousHash(String previousHash) {
         this.previousHash = previousHash;
+    }
+
+    public String getTransactionHash() {
+        return transactionHash;
+    }
+
+    public void setTransactionHash(String transactionHash) {
+        this.transactionHash = transactionHash;
     }
 
     public List<GameEntity> getGames() {

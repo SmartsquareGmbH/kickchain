@@ -60,4 +60,14 @@ public class BlockHeader {
         return MessageDigestUtils.sha256(blockHeaderAsString);
     }
 
+    @Override
+    public String toString() {
+        return "BlockHeader{" +
+                "index=" + index +
+                ", timestamp=" + timestamp +
+                ", transactionHash='" + transactionHash + '\'' +
+                ", previousHash='" + previousHash + '\'' +
+                ", proof=" + proof +
+                '}';
+    }
 }

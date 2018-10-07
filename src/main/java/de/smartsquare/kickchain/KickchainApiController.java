@@ -5,6 +5,8 @@ import de.smartsquare.kickchain.domain.Blockchain;
 import de.smartsquare.kickchain.domain.Game;
 import de.smartsquare.kickchain.service.DatabaseService;
 import de.smartsquare.kickchain.service.KickchainService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import javax.annotation.PostConstruct;
 public class KickchainApiController {
 
     public static final String KICKCHAIN = "Kickchain";
+
+    private final Logger logger = LoggerFactory.getLogger(KickchainApiController.class);
 
     private final KickchainService kickchainService;
     private final DatabaseService databaseService;
@@ -46,6 +50,7 @@ public class KickchainApiController {
     @PostMapping(value = "/game/new")
     @ResponseBody
     public ResponseEntity<?> newGame(@RequestBody Game game) throws BlockchainException {
+        logger.info("newGame(" + game + ") called...");
         Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
         Block newBlock = kickchainService.newGame(blockchain.lastBlock(), game);
         databaseService.addBlock(blockchain.getName(), newBlock);
@@ -55,10 +60,14 @@ public class KickchainApiController {
     @GetMapping(value = "/chain")
     @ResponseBody
     public Blockchain fullChain() {
-        return databaseService.loadBlockchain(KICKCHAIN);
+        logger.info("chain called...");
+        Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
+        logger.debug("chain called. blockchain is " + blockchain);
+        return blockchain;
     }
 
     private void newChain(String name) {
+        logger.info("newChain(" + name +") called...");
         Block genesisBlock = kickchainService.create();
         databaseService.createBlockchain(name, genesisBlock);
     }

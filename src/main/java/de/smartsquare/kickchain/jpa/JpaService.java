@@ -68,6 +68,7 @@ public class JpaService implements DatabaseService {
         blockEntity.setPreviousHash(block.getHeader().getPreviousHash());
         blockEntity.setProof(block.getHeader().getProof());
         blockEntity.setTimestamp(block.getHeader().getTimestamp());
+        blockEntity.setTransactionHash(block.getHeader().getTransactionHash());
         return blockEntity;
     }
 
@@ -102,7 +103,7 @@ public class JpaService implements DatabaseService {
     public Blockchain loadBlockchain(String name) {
         List<Block> blocks = blockRepository.findAllByBlockchain(name).stream()
                 .sorted(compareByIndex())
-                .map(be -> new Block(be.getIndex(), be.getTimestamp(), getGames(be), be.getProof(), be.getPreviousHash()))
+                .map(be -> new Block(be.getIndex(), be.getTimestamp(), be.getProof(), be.getPreviousHash(), be.getTransactionHash(), getGames(be)))
                 .collect(Collectors.toList());
         if (blocks.isEmpty()) {
             return null;

@@ -30,6 +30,8 @@ public class BlockNodeEntity {
 
     private String previousHash;
 
+    private String transactionHash;
+
     @Relationship(type = "HASGAME", direction = "INCOMING")
     private HasGamesRelationshipEntity game;
 
@@ -85,6 +87,14 @@ public class BlockNodeEntity {
         this.previousHash = previousHash;
     }
 
+    public String getTransactionHash() {
+        return transactionHash;
+    }
+
+    public void setTransactionHash(String transactionHash) {
+        this.transactionHash = transactionHash;
+    }
+
     public FollowsRelationshipEntity getFollows() {
         return follows;
     }
@@ -99,13 +109,6 @@ public class BlockNodeEntity {
 
     public void setGame(HasGamesRelationshipEntity game) {
         this.game = game;
-    }
-
-    public String toHash() throws IOException, NoSuchAlgorithmException {
-        ObjectMapper mapper = new ObjectMapper();
-        StringWriter writer = new StringWriter();
-        mapper.writeValue(writer, this);
-        return MessageDigestUtils.sha256(writer.toString());
     }
 
     @Override
