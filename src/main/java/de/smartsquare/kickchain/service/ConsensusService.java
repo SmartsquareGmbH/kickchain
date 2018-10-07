@@ -75,6 +75,7 @@ public class ConsensusService {
             for (Block b : collect) {
                 // check proof of work
                 if (!proof.apply(latestBlock.getHeader().getProof(), b.getHeader().getProof())) {
+                    logger.debug("The proof does not apply.");
                     return false;
                 }
                 latestBlock = b;

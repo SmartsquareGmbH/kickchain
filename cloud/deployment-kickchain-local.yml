@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kickchain-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kickchain-demo
+  template:
+    metadata:
+      labels:
+        app: kickchain-demo
+    spec:
+      containers:
+      - name: kickchain-demo
+        image: skonair/kickchain-demo:latest
+        ports:
+        - containerPort: 8080
+        command: ["java"]
+        args:
+        - -Djava.security.egd=file:/dev/./urandom
+        - -jar
+        - /kickchain.jar
+        - --database.type=jpa

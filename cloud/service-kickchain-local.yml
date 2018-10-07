@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kickchain-service
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: kickchain-demo
+  type: NodePort
