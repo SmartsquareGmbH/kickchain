@@ -23,7 +23,7 @@ public class MessageDigestUtils {
         try {
             mapper.writeValue(writer, content);
             String blockAsString = writer.toString();
-            logger.info(String.format("Transactions as string: %s", blockAsString));
+            logger.debug(String.format("Transactions as string: %s", blockAsString));
             return MessageDigestUtils.sha256(blockAsString);
         } catch (NoSuchAlgorithmException | IOException e) {
             logger.error("Unable to hash the list of transactions.", e);
