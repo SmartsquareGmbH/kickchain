@@ -26,6 +26,19 @@ Install and setup a Neo4j server.
 ### Maven
 
     $ mvn clean install
+    
+### Start stand-alone
+
+    $ java -Djava.security.egd=file:/dev/./urandom -jar target/kickchain-0.0.1-SNAPSHOT.jar
+
+### List of configuration options
+
+    # default peers for the internal consensus service; comma separated list of ip-address:ports
+    consensus.peers=
+
+    # can be neo4j or jpa (default)
+    database.type=jpa
+
 
 ### Docker
 
