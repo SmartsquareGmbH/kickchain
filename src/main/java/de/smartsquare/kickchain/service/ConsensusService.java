@@ -112,7 +112,7 @@ public class ConsensusService {
             logger.info("Resolving node" + node + "...");
             try {
                 RestTemplate restTemplate = new RestTemplate();
-                ResponseEntity<Blockchain> response = restTemplate.getForEntity("http://" + node + "/chain", Blockchain.class);
+                ResponseEntity<Blockchain> response = restTemplate.getForEntity(node, Blockchain.class);
                 logger.debug("response is " + response);
                 if (response.getStatusCode().equals(HttpStatus.OK)) {
                     Blockchain blockchain = response.getBody();
