@@ -28,7 +28,7 @@ public class ConsensusScheduler {
             Blockchain blockchain = databaseService.loadBlockchain(KICKCHAIN);
         Blockchain resolvedChain = consensusService.resolveConflicts(blockchain);
             List<Block> nodesToAdd = resolvedChain.getChain().stream()
-                    .filter(b -> b.getHeader().getIndex() > blockchain.lastIndex())
+                    .filter(b -> b.getHeader().getIndex() >= blockchain.lastIndex())
                     .collect(Collectors.toList());
             for (Block b : nodesToAdd) {
                 databaseService.addBlock(KICKCHAIN, b);
